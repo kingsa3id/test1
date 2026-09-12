@@ -1,4 +1,18 @@
-// Default Translation Keys
+// Firebase Initialization
+const firebaseConfig = {
+    apiKey: "AIzaSyD0uoL6QS40S8Am8WYdLoFfxEsQuhqQPLQ",
+    authDomain: "photoshop-e8266.firebaseapp.com",
+    projectId: "photoshop-e8266",
+    storageBucket: "photoshop-e8266.firebasestorage.app",
+    messagingSenderId: "703007614918",
+    appId: "1:703007614918:web:31241b0b4830ec3681f4c7",
+    measurementId: "G-J1XE0B32HN"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+// Translations Database
 const defaultTranslations = {
     fr: {
         langBtn: "العربية",
@@ -25,10 +39,7 @@ const defaultTranslations = {
         lblNama: "Nom complet",
         lblPhone: "Numéro de téléphone",
         lblType: "Type de séance",
-        lblDateTime: "Date et Heure de la séance", // Added translation
-        optWedding: "Photographie de mariage",
-        optPortrait: "Séance Portrait",
-        optEvent: "Couverture d'événement",
+        lblDateTime: "Date et Heure de la séance",
         btnSubmit: "Confirmer la réservation",
         alertMsg: "Merci! Votre demande de réservation a été envoyée."
     },
@@ -57,88 +68,66 @@ const defaultTranslations = {
         lblNama: "الاسم الكامل",
         lblPhone: "رقم الهاتف",
         lblType: "نوع الجلسة",
-        lblDateTime: "تاريخ ووقت الجلسة", // Added translation
-        optWedding: "تصوير أعراس",
-        optPortrait: "جلسة بورتوريه",
-        optEvent: "تغطية مناسبات",
+        lblDateTime: "تاريخ ووقت الجلسة",
         btnSubmit: "تأكيد الحجز",
         alertMsg: "شكراً لك! تم استلام طلب الحجز بنجاح."
     }
 };
 
-// Default Gallery Items
 const defaultGallery = [
-    {
-        img: "https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=80",
-        catFr: "Mariage",
-        catAr: "أعراس",
-        title: "Elegance in White"
-    },
-    {
-        img: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=800&q=80",
-        catFr: "Portrait",
-        catAr: "بورتوريه",
-        title: "Studio Series"
-    },
-    {
-        img: "https://images.unsplash.com/photo-1469371670807-013ccf25f16a?auto=format&fit=crop&w=800&q=80",
-        catFr: "Événement",
-        catAr: "مناسبات",
-        title: "Gala Evening"
-    }
+    { img: "https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=80", catFr: "Mariage", catAr: "أعراس", title: "Elegance in White" },
+    { img: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=800&q=80", catFr: "Portrait", catAr: "بورتوريه", title: "Studio Series" },
+    { img: "https://images.unsplash.com/photo-1469371670807-013ccf25f16a?auto=format&fit=crop&w=800&q=80", catFr: "Événement", catAr: "مناسبات", title: "Gala Evening" }
 ];
 
-// Load Custom Admin Edits if available
 let translations = JSON.parse(localStorage.getItem('site_translations')) || defaultTranslations;
 let galleryItems = JSON.parse(localStorage.getItem('site_gallery')) || defaultGallery;
-
 let currentLang = 'fr';
+let cachedSessionTypes = [];
 
+// Initialize Page
 document.addEventListener("DOMContentLoaded", () => {
     renderGallery();
     applyLanguage(currentLang);
+    listenToSessionTypes();
 });
 
+// Dynamic Language Switching
 function applyLanguage(lang) {
     const html = document.documentElement;
     html.setAttribute('lang', lang);
     html.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
 
     const data = translations[lang];
-    
-    document.getElementById('langToggle').querySelector('span').innerText = data.langBtn;
-    document.getElementById('navGallery').innerText = data.navGallery;
-    document.getElementById('navAbout').innerText = data.navAbout;
-    document.getElementById('navContact').innerText = data.navContact;
-    document.getElementById('heroTagline').innerText = data.heroTagline;
-    document.getElementById('heroTitle').innerHTML = data.heroTitle;
-    document.getElementById('heroDesc').innerText = data.heroDesc;
-    document.getElementById('btnBook').innerText = data.btnBook;
-    document.getElementById('btnCall').innerText = data.btnCall;
-    document.getElementById('gallerySub').innerText = data.gallerySub;
-    document.getElementById('galleryTitle').innerText = data.galleryTitle;
-    
-    document.getElementById('aboutSub').innerText = data.aboutSub;
-    document.getElementById('aboutTitle').innerText = data.aboutTitle;
-    document.getElementById('aboutDesc1').innerText = data.aboutDesc1;
-    document.getElementById('aboutDesc2').innerText = data.aboutDesc2;
-    document.getElementById('badgeYears').innerText = data.badgeYears;
-    document.getElementById('feat1').innerText = data.feat1;
-    document.getElementById('feat2').innerText = data.feat2;
-    document.getElementById('footerCopy').innerText = data.footerCopy;
-
-    document.getElementById('modalTitle').innerText = data.modalTitle;
-    document.getElementById('modalDesc').innerText = data.modalDesc;
-    document.getElementById('lblNama').innerText = data.lblNama;
-    document.getElementById('lblPhone').innerText = data.lblPhone;
-    document.getElementById('lblType').innerText = data.lblType;
-    document.getElementById('lblDateTime').innerText = data.lblDateTime; // Update new field language
-    document.getElementById('optWedding').innerText = data.optWedding;
-    document.getElementById('optPortrait').innerText = data.optPortrait;
-    document.getElementById('optEvent').innerText = data.optEvent;
-    document.getElementById('btnSubmit').innerText = data.btnSubmit;
+    if (document.getElementById('langToggle')) document.getElementById('langToggle').querySelector('span').innerText = data.langBtn;
+    if (document.getElementById('navGallery')) document.getElementById('navGallery').innerText = data.navGallery;
+    if (document.getElementById('navAbout')) document.getElementById('navAbout').innerText = data.navAbout;
+    if (document.getElementById('navContact')) document.getElementById('navContact').innerText = data.navContact;
+    if (document.getElementById('heroTagline')) document.getElementById('heroTagline').innerText = data.heroTagline;
+    if (document.getElementById('heroTitle')) document.getElementById('heroTitle').innerHTML = data.heroTitle;
+    if (document.getElementById('heroDesc')) document.getElementById('heroDesc').innerText = data.heroDesc;
+    if (document.getElementById('btnBook')) document.getElementById('btnBook').innerText = data.btnBook;
+    if (document.getElementById('btnCall')) document.getElementById('btnCall').innerText = data.btnCall;
+    if (document.getElementById('gallerySub')) document.getElementById('gallerySub').innerText = data.gallerySub;
+    if (document.getElementById('galleryTitle')) document.getElementById('galleryTitle').innerText = data.galleryTitle;
+    if (document.getElementById('aboutSub')) document.getElementById('aboutSub').innerText = data.aboutSub;
+    if (document.getElementById('aboutTitle')) document.getElementById('aboutTitle').innerText = data.aboutTitle;
+    if (document.getElementById('aboutDesc1')) document.getElementById('aboutDesc1').innerText = data.aboutDesc1;
+    if (document.getElementById('aboutDesc2')) document.getElementById('aboutDesc2').innerText = data.aboutDesc2;
+    if (document.getElementById('badgeYears')) document.getElementById('badgeYears').innerText = data.badgeYears;
+    if (document.getElementById('feat1')) document.getElementById('feat1').innerText = data.feat1;
+    if (document.getElementById('feat2')) document.getElementById('feat2').innerText = data.feat2;
+    if (document.getElementById('footerCopy')) document.getElementById('footerCopy').innerText = data.footerCopy;
+    if (document.getElementById('modalTitle')) document.getElementById('modalTitle').innerText = data.modalTitle;
+    if (document.getElementById('modalDesc')) document.getElementById('modalDesc').innerText = data.modalDesc;
+    if (document.getElementById('lblNama')) document.getElementById('lblNama').innerText = data.lblNama;
+    if (document.getElementById('lblPhone')) document.getElementById('lblPhone').innerText = data.lblPhone;
+    if (document.getElementById('lblType')) document.getElementById('lblType').innerText = data.lblType;
+    if (document.getElementById('lblDateTime')) document.getElementById('lblDateTime').innerText = data.lblDateTime;
+    if (document.getElementById('btnSubmit')) document.getElementById('btnSubmit').innerText = data.btnSubmit;
 
     renderGallery();
+    renderSessionOptions();
 }
 
 function toggleLanguage() {
@@ -146,6 +135,7 @@ function toggleLanguage() {
     applyLanguage(currentLang);
 }
 
+// Portfolio Grid Renderer
 function renderGallery() {
     const grid = document.getElementById('galleryGrid');
     if (!grid) return;
@@ -153,7 +143,7 @@ function renderGallery() {
 
     galleryItems.forEach(item => {
         const cat = currentLang === 'ar' ? item.catAr : item.catFr;
-        const cardHtml = `
+        grid.innerHTML += `
             <div class="gallery-card">
                 <img src="${item.img}" alt="${item.title}">
                 <div class="card-overlay">
@@ -162,76 +152,110 @@ function renderGallery() {
                 </div>
             </div>
         `;
-        grid.innerHTML += cardHtml;
     });
 }
 
-// Modal logic
+// Modal Control
 const modal = document.getElementById('bookingModal');
-function openModal() { modal.classList.add('active'); }
-function closeModal() { modal.classList.remove('active'); }
+function openModal() { if (modal) modal.classList.add('active'); }
+function closeModal() { if (modal) modal.classList.remove('active'); }
+window.onclick = function(event) { if (event.target === modal) closeModal(); };
 
-window.onclick = function(event) {
-    if (event.target === modal) closeModal();
-};
+// Real-Time Session Types Firestore Listener
+function listenToSessionTypes() {
+    db.collection("session_types").onSnapshot((snapshot) => {
+        cachedSessionTypes = [];
+        snapshot.forEach((doc) => {
+            cachedSessionTypes.push(doc.data());
+        });
+        renderSessionOptions();
+    });
+}
 
-// Form submission handler -> Includes Anti-Spam & Anti-Overlap Booking
-function handleFormSubmit(event) {
-    event.preventDefault();
-    
-    const nameInput = document.getElementById('inputName').value.trim();
-    const phoneInput = document.getElementById('inputPhone').value.trim();
-    const typeInput = document.getElementById('inputType').value;
-    const dateTimeInput = document.getElementById('inputDateTime').value; // Get chosen date & time
+function renderSessionOptions() {
+    const select = document.getElementById('inputType');
+    if (!select) return;
 
-    // 1. Anti-Fake: Validate Name (At least 3 characters)
-    if (nameInput.length < 3) {
-        alert(currentLang === 'fr' ? "Veuillez entrer un nom valide (minimum 3 caractères)." : "الرجاء إدخال اسم صحيح (3 أحرف على الأقل).");
+    const currentSelection = select.value;
+    select.innerHTML = '';
+
+    if (cachedSessionTypes.length === 0) {
+        select.innerHTML = `
+            <option value="Photographie de mariage">${currentLang === 'ar' ? 'تصوير أعراس' : 'Photographie de mariage'}</option>
+            <option value="Séance Portrait">${currentLang === 'ar' ? 'جلسة بورتوريه' : 'Séance Portrait'}</option>
+            <option value="Couverture d\'événement">${currentLang === 'ar' ? 'تغطية مناسبات' : 'Couverture d\'événement'}</option>
+        `;
         return;
     }
 
-    // 2. Anti-Fake: Validate Phone Number (Basic regex for 9 to 15 digits)
+    cachedSessionTypes.forEach(session => {
+        const option = document.createElement('option');
+        option.value = session.fr;
+        option.innerText = currentLang === 'ar' ? session.ar : session.fr;
+        select.appendChild(option);
+    });
+
+    if (currentSelection) select.value = currentSelection;
+}
+
+// Async Form Submission directly synced with Firebase Cloud Database
+async function handleFormSubmit(event) {
+    event.preventDefault();
+    
+    const submitBtn = document.getElementById('btnSubmit');
+    const nameInput = document.getElementById('inputName').value.trim();
+    const phoneInput = document.getElementById('inputPhone').value.trim();
+    const typeInput = document.getElementById('inputType').value;
+    const dateTimeInput = document.getElementById('inputDateTime').value;
+
+    if (nameInput.length < 3) {
+        alert(currentLang === 'fr' ? "Veuillez entrer un nom valide." : "الرجاء إدخال اسم صحيح.");
+        return;
+    }
+
     const phoneRegex = /^[0-9+\s-]{9,15}$/;
     if (!phoneRegex.test(phoneInput)) {
         alert(currentLang === 'fr' ? "Veuillez entrer un numéro de téléphone valide." : "الرجاء إدخال رقم هاتف صحيح.");
         return;
     }
 
-    // 3. Anti-Spam: 5-minute cooldown between bookings
-    const now = Date.now();
-    const lastBookingTime = localStorage.getItem('last_booking_time');
-    
-    if (lastBookingTime && (now - parseInt(lastBookingTime)) < 300000) { // 300,000 ms = 5 minutes
-        alert(currentLang === 'fr' ? "Veuillez patienter quelques minutes avant de faire une nouvelle demande pour éviter le spam." : "الرجاء الانتظار بضع دقائق قبل تقديم طلب جديد لتجنب البريد العشوائي.");
-        return;
+    submitBtn.disabled = true;
+    submitBtn.innerText = currentLang === 'fr' ? "Vérification..." : "جاري التحقق...";
+
+    try {
+        // Query Firestore to verify date/time slot availability
+        const snapshot = await db.collection("bookings")
+            .where("bookedDateTime", "==", dateTimeInput)
+            .get();
+
+        if (!snapshot.empty) {
+            alert(currentLang === 'fr' 
+                ? "Ce créneau est déjà réservé. Veuillez choisir une autre date/heure." 
+                : "هذا الموعد محجوز مسبقاً. الرجاء اختيار وقت آخر.");
+            submitBtn.disabled = false;
+            submitBtn.innerText = translations[currentLang].btnSubmit;
+            return;
+        }
+
+        // Write booking to Cloud Firestore
+        await db.collection("bookings").add({
+            name: nameInput,
+            phone: phoneInput,
+            type: typeInput,
+            bookedDateTime: dateTimeInput,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+
+        alert(translations[currentLang].alertMsg);
+        closeModal();
+        event.target.reset();
+    } catch (error) {
+        console.error("Booking Error:", error);
+        alert(currentLang === 'fr' 
+            ? "Une erreur est survenue lors de l'enregistrement. Veuillez réessayer." 
+            : "حدث خطأ أثناء الحفظ. يرجى المحاولة مرة أخرى.");
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerText = translations[currentLang].btnSubmit;
     }
-
-    // 4. Anti-Overlap: Check if the exact Date and Time is already booked
-    let existingBookings = JSON.parse(localStorage.getItem('site_bookings')) || [];
-    const isAlreadyBooked = existingBookings.some(b => b.bookedDateTime === dateTimeInput);
-
-    if (isAlreadyBooked) {
-        alert(currentLang === 'fr' ? "Ce créneau est déjà réservé. Veuillez choisir une autre date/heure." : "هذا الموعد محجوز مسبقاً. الرجاء اختيار وقت آخر.");
-        return; // Stop the booking process
-    }
-
-    // Create the booking object
-    const newBooking = {
-        name: nameInput,
-        phone: phoneInput,
-        type: typeInput,
-        bookedDateTime: dateTimeInput, // Saves the time they want the session
-        submissionDate: new Date().toLocaleString() // Saves the time they filled the form
-    };
-
-    // Save to LocalStorage
-    existingBookings.push(newBooking);
-    localStorage.setItem('site_bookings', JSON.stringify(existingBookings));
-    
-    // Set the anti-spam timer
-    localStorage.setItem('last_booking_time', now.toString());
-
-    alert(translations[currentLang].alertMsg);
-    closeModal();
-    event.target.reset(); // Clear the form fields
 }
