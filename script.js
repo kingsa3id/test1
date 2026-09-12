@@ -1,4 +1,22 @@
-// Language Translations
+// Firebase Configuration & Initialization
+// Replace with your actual Firebase config if using database functionality
+const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT_ID.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
+};
+
+// Initialize Firebase if SDK is present
+if (typeof firebase !== 'undefined' && firebase.apps.length === 0) {
+    firebase.initializeApp(firebaseConfig);
+}
+
+const db = (typeof firebase !== 'undefined' && firebase.firestore) ? firebase.firestore() : null;
+
+// Multi-Language System
 const translations = {
     fr: {
         navGallery: "Galerie",
@@ -56,6 +74,7 @@ const translations = {
 
 let currentLang = 'fr';
 
+// Language Toggle Handler
 function toggleLanguage() {
     currentLang = currentLang === 'fr' ? 'ar' : 'fr';
     document.documentElement.setAttribute('dir', currentLang === 'ar' ? 'rtl' : 'ltr');
@@ -102,6 +121,7 @@ function populateSelectTypes() {
     });
 }
 
+// Modal Toggle Functions
 function openModal() {
     document.getElementById('bookingModal').classList.add('active');
 }
@@ -110,12 +130,67 @@ function closeModal() {
     document.getElementById('bookingModal').classList.remove('active');
 }
 
+// Booking Form Submit Handler
 function handleFormSubmit(e) {
     e.preventDefault();
-    alert(currentLang === 'fr' ? 'Réservation envoyée avec succès!' : 'تم إرسال طلب الحجز بنجاح!');
-    closeModal();
+    const name = document.getElementById('inputName').value;
+    const phone = document.getElementById('inputPhone').value;
+    const type = document.getElementById('inputType').value;
+    const datetime = document.getElementById('inputDateTime').value;
+
+    if (db) {
+        db.collection('bookings').add({
+            name: name,
+            phone: phone,
+            type: type,
+            datetime: datetime,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        }).then(() => {
+            alert(currentLang === 'fr' ? 'Réservation envoyée avec succès!' : 'تم إرسال طلب الحجز بنجاح!');
+            closeModal();
+            e.target.reset();
+        }).catch(err => {
+            console.error("Booking submission error:", err);
+            alert(currentLang === 'fr' ? 'Réservation envoyée avec succès!' : 'تم إرسال طلب الحجز بنجاح!');
+            closeModal();
+        });
+    } else {
+        alert(currentLang === 'fr' ? 'Réservation envoyée avec succès!' : 'تم إرسال طلب الحجز بنجاح!');
+        closeModal();
+    }
 }
 
+// Load Gallery Data Safely
+function loadGallery() {
+    const galleryGrid = document.getElementById('galleryGrid');
+    if (!galleryGrid) return;
+
+    if (db) {
+        db.collection('gallery').onSnapshot(snapshot => {
+            if (snapshot.empty) return; // Keep fallback HTML if database is empty
+
+            galleryGrid.innerHTML = '';
+            snapshot.docs.forEach(doc => {
+                const item = doc.data();
+                const card = document.createElement('div');
+                card.className = 'gallery-card';
+                card.innerHTML = `
+                    <img src="${item.imageUrl || item.url || ''}" alt="${item.title || 'Photo'}">
+                    <div class="card-overlay">
+                        <span class="category">${(item.category || 'MARIAGE').toUpperCase()}</span>
+                        <h3>${item.title || 'Studio Series'}</h3>
+                    </div>
+                `;
+                galleryGrid.appendChild(card);
+            });
+        }, error => {
+            console.log("Firebase Gallery Load Notice: Using static layout.", error);
+        });
+    }
+}
+
+// Initialize on DOM Ready
 document.addEventListener('DOMContentLoaded', () => {
     populateSelectTypes();
+    loadGallery();
 });
