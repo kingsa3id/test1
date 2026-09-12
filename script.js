@@ -172,24 +172,53 @@ window.onclick = function(event) {
     if (event.target === modal) closeModal();
 };
 
-// Form submission handler -> Saves lead into LocalStorage for Admin view!
+// Form submission handler -> Includes Anti-Spam & Validation
 function handleFormSubmit(event) {
     event.preventDefault();
-    const name = document.getElementById('inputName').value;
-    const phone = document.getElementById('inputPhone').value;
-    const type = document.getElementById('inputType').value;
+    
+    const nameInput = document.getElementById('inputName').value.trim();
+    const phoneInput = document.getElementById('inputPhone').value.trim();
+    const typeInput = document.getElementById('inputType').value;
 
+    // 1. Anti-Fake: Validate Name (At least 3 characters)
+    if (nameInput.length < 3) {
+        alert(currentLang === 'fr' ? "Veuillez entrer un nom valide (minimum 3 caractères)." : "الرجاء إدخال اسم صحيح (3 أحرف على الأقل).");
+        return;
+    }
+
+    // 2. Anti-Fake: Validate Phone Number (Basic regex for 9 to 15 digits)
+    const phoneRegex = /^[0-9+\s-]{9,15}$/;
+    if (!phoneRegex.test(phoneInput)) {
+        alert(currentLang === 'fr' ? "Veuillez entrer un numéro de téléphone valide." : "الرجاء إدخال رقم هاتف صحيح.");
+        return;
+    }
+
+    // 3. Anti-Spam: 5-minute cooldown between bookings
+    const now = Date.now();
+    const lastBookingTime = localStorage.getItem('last_booking_time');
+    
+    if (lastBookingTime && (now - parseInt(lastBookingTime)) < 300000) { // 300,000 ms = 5 minutes
+        alert(currentLang === 'fr' ? "Veuillez patienter quelques minutes avant de faire une nouvelle demande pour éviter le spam." : "الرجاء الانتظار بضع دقائق قبل تقديم طلب جديد لتجنب البريد العشوائي.");
+        return;
+    }
+
+    // Create the booking object
     const newBooking = {
-        name,
-        phone,
-        type,
-        date: new Date().toLocaleDateString('fr-FR')
+        name: nameInput,
+        phone: phoneInput,
+        type: typeInput,
+        date: new Date().toLocaleString() // Saves exact time of booking
     };
 
+    // Save to LocalStorage
     let existingBookings = JSON.parse(localStorage.getItem('site_bookings')) || [];
     existingBookings.push(newBooking);
     localStorage.setItem('site_bookings', JSON.stringify(existingBookings));
+    
+    // Set the anti-spam timer
+    localStorage.setItem('last_booking_time', now.toString());
 
     alert(translations[currentLang].alertMsg);
     closeModal();
+    event.target.reset(); // Clear the form fields
 }
