@@ -12,13 +12,12 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-// Language & Site Translations
+// Site Translations
 const defaultTranslations = {
     fr: {
         langBtn: "العربية",
         navGallery: "Galerie",
         navAbout: "À Propos",
-        navContact: "Contact",
         heroTagline: "STUDIO DE PHOTOGRAPHIE HAUT DE GAMME",
         heroTitle: "Saisir Des Moments <br><span class='text-accent'>Intemporels</span>",
         heroDesc: "Photographie d'art pour mariages, portraits de prestige et événements.",
@@ -26,14 +25,6 @@ const defaultTranslations = {
         btnCall: "Appeler maintenant",
         gallerySub: "PORTFOLIO",
         galleryTitle: "Travaux Récents",
-        aboutSub: "À PROPOS DE NOUS",
-        aboutTitle: "Capturer L'Émotion Avec Passion & Précision",
-        aboutDesc1: "Notre studio s'efforce de capturer la véritable essence de vos moments les plus précieux.",
-        aboutDesc2: "Nous combinons une approche artistique raffinée avec des équipements de pointe.",
-        badgeYears: "Ans d'expérience",
-        feat1: "Matériel Professionnel High-End",
-        feat2: "Retouche Artistique Soignée",
-        footerCopy: "© 2026 LENS & ART. Tous droits réservés.",
         modalTitle: "Réserver une séance photo",
         modalDesc: "Complétez le formulaire ci-dessous pour réserver votre date.",
         lblNama: "Nom complet",
@@ -41,13 +32,13 @@ const defaultTranslations = {
         lblType: "Type de séance",
         lblDateTime: "Date et Heure de la séance",
         btnSubmit: "Confirmer la réservation",
+        footerCopy: "© 2026 LENS & ART. Tous droits réservés.",
         alertMsg: "Merci! Votre demande de réservation a été envoyée."
     },
     ar: {
         langBtn: "Français",
         navGallery: "معرض الصور",
         navAbout: "من نحن",
-        navContact: "اتصل بنا",
         heroTagline: "استوديو تصوير فوتوغرافي فاخر",
         heroTitle: "تخليد أجمـل <br><span class='text-accent'>اللحظات</span>",
         heroDesc: "تصوير احترافي للأعراس، البورتوريه الفاخر، والمناسبات.",
@@ -55,14 +46,6 @@ const defaultTranslations = {
         btnCall: "اتصل الآن",
         gallerySub: "معرض الأعمال",
         galleryTitle: "أحدث الأعمال",
-        aboutSub: "من نحن",
-        aboutTitle: "نلتقط المشاعر بشغف ودقة متناهية",
-        aboutDesc1: "نعمل جاهدين لتوثيق الجوهر الحقيقي لأجمل لحظات حياتك.",
-        aboutDesc2: "نجمع بين الحس الفني الرفيع وأحدث تقنيات التصوير لنقدم لك جودة استثنائية.",
-        badgeYears: "سنوات من الخبرة",
-        feat1: "معدات تصوير احترافية عالية الجودة",
-        feat2: "معالجة وتعديل فني دقيق للصور",
-        footerCopy: "© 2026 LENS & ART. جميع الحقوق محفوظة.",
         modalTitle: "حجز جلسة تصوير جديدة",
         modalDesc: "يرجى ملء النموذج أدناه لتأكيد موعد الجلسة.",
         lblNama: "الاسم الكامل",
@@ -70,6 +53,7 @@ const defaultTranslations = {
         lblType: "نوع الجلسة",
         lblDateTime: "تاريخ ووقت الجلسة",
         btnSubmit: "تأكيد الحجز",
+        footerCopy: "© 2026 LENS & ART. جميع الحقوق محفوظة.",
         alertMsg: "شكراً لك! تم استلام طلب الحجز بنجاح."
     }
 };
@@ -83,13 +67,9 @@ document.addEventListener("DOMContentLoaded", () => {
     applyLanguage(currentLang);
     listenToSessionTypes();
     listenToCategories();
-
-    const langBtn = document.getElementById('langToggle');
-    if (langBtn) {
-        langBtn.onclick = toggleLanguage;
-    }
 });
 
+// Toggle Language Logic
 function toggleLanguage() {
     currentLang = currentLang === 'fr' ? 'ar' : 'fr';
     applyLanguage(currentLang);
@@ -102,40 +82,36 @@ function applyLanguage(lang) {
     html.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
 
     const data = defaultTranslations[lang];
-    
-    const langBtn = document.getElementById('langToggle');
-    if (langBtn) langBtn.innerText = data.langBtn;
 
-    const map = {
+    const langBtn = document.getElementById('langToggle');
+    if (langBtn) {
+        const span = langBtn.querySelector('span');
+        if (span) span.innerText = data.langBtn;
+        else langBtn.innerText = data.langBtn;
+    }
+
+    const elementMap = {
         'navGallery': data.navGallery,
         'navAbout': data.navAbout,
-        'navContact': data.navContact,
         'heroTagline': data.heroTagline,
         'heroDesc': data.heroDesc,
         'btnBook': data.btnBook,
         'btnCall': data.btnCall,
         'gallerySub': data.gallerySub,
         'galleryTitle': data.galleryTitle,
-        'aboutSub': data.aboutSub,
-        'aboutTitle': data.aboutTitle,
-        'aboutDesc1': data.aboutDesc1,
-        'aboutDesc2': data.aboutDesc2,
-        'badgeYears': data.badgeYears,
-        'feat1': data.feat1,
-        'feat2': data.feat2,
-        'footerCopy': data.footerCopy,
         'modalTitle': data.modalTitle,
         'modalDesc': data.modalDesc,
         'lblNama': data.lblNama,
         'lblPhone': data.lblPhone,
         'lblType': data.lblType,
         'lblDateTime': data.lblDateTime,
-        'btnSubmit': data.btnSubmit
+        'btnSubmit': data.btnSubmit,
+        'footerCopy': data.footerCopy
     };
 
-    for (let id in map) {
+    for (let id in elementMap) {
         const el = document.getElementById(id);
-        if (el) el.innerText = map[id];
+        if (el) el.innerText = elementMap[id];
     }
 
     const heroTitle = document.getElementById('heroTitle');
@@ -145,7 +121,7 @@ function applyLanguage(lang) {
     renderGallery();
 }
 
-// Modal Controls
+// Modal Functions
 function openModal() {
     const modal = document.getElementById('bookingModal');
     if (modal) modal.classList.add('active');
@@ -163,7 +139,7 @@ window.onclick = function(event) {
     if (event.target === modal) closeModal();
 };
 
-// Real-Time Listeners
+// Firestore Listeners
 function listenToSessionTypes() {
     db.collection("session_types").onSnapshot((snapshot) => {
         cachedSessionTypes = [];
@@ -212,7 +188,7 @@ function renderGallery() {
     });
 }
 
-// Booking Form
+// Form Handlers
 async function handleFormSubmit(event) {
     event.preventDefault();
     const nameInput = document.getElementById('inputName').value.trim();
