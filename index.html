@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="fr" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LENS & ART | Fine Art Photography</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Navigation Header -->
+    <header class="navbar">
+        <a href="#" class="brand-logo">LENS <span>&</span> ART</a>
+        
+        <nav class="nav-links">
+            <a href="#gallery" id="navGallery">Galerie</a>
+            <a href="#about" id="navAbout">À Propos</a>
+            <a href="#contact" id="navContact">Contact</a>
+        </nav>
+
+        <div class="nav-actions">
+            <button class="lang-switch" id="langToggle" onclick="toggleLanguage()">
+                <i class="fa-solid fa-globe"></i> <span>العربية</span>
+            </button>
+            <!-- Admin link removed to keep it hidden -->
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <span class="hero-tagline" id="heroTagline">STUDIO DE PHOTOGRAPHIE HAUT DE GAMME</span>
+            <h1 id="heroTitle">Saisir Des Moments <br><span class="text-accent">Intemporels</span></h1>
+            <p id="heroDesc">Photographie d'art pour mariages, portraits de prestige et événements. Vos souvenirs immortalisés avec élégance.</p>
+            
+            <div class="hero-actions">
+                <button class="btn btn-gold" onclick="openModal()">
+                    <i class="fa-regular fa-calendar-check"></i> <span id="btnBook">Réserver une séance</span>
+                </button>
+                <a href="tel:+213550000000" class="btn btn-glass">
+                    <i class="fa-solid fa-phone"></i> <span id="btnCall">Appeler maintenant</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Portfolio Gallery Section -->
+    <section class="gallery-section" id="gallery">
+        <div class="section-header">
+            <span class="sub-title" id="gallerySub">PORTFOLIO</span>
+            <h2 id="galleryTitle">Travaux Récents</h2>
+            <div class="gold-line"></div>
+        </div>
+
+        <div class="gallery-grid" id="galleryGrid">
+            <!-- Dynamic items rendered from JS / LocalStorage -->
+        </div>
+    </section>
+
+    <!-- About Us Section -->
+    <section class="about-section" id="about">
+        <div class="about-container">
+            <div class="about-image">
+                <img src="https://images.unsplash.com/photo-1554048612-b6a482bc67e5?auto=format&fit=crop&w=800&q=80" alt="Photographer Profile">
+                <div class="experience-badge">
+                    <span class="badge-num">10+</span>
+                    <span class="badge-text" id="badgeYears">Ans d'expérience</span>
+                </div>
+            </div>
+            <div class="about-content">
+                <span class="sub-title" id="aboutSub">À PROPOS DE NOUS</span>
+                <h2 id="aboutTitle">Capturer L'Émotion Avec Passion & Précision</h2>
+                <div class="gold-line left-align"></div>
+                
+                <p id="aboutDesc1">Fondé sur une passion pour l'art visuel et le storytelling, notre studio s'efforce de capturer la véritable essence de vos moments les plus précieux. Nous croyons que chaque photographie doit raconter une histoire intemporelle.</p>
+                <p id="aboutDesc2">Que ce soit pour votre mariage, un portrait professionnel ou un événement d'exception, nous combinons une approche artistique raffinée avec des équipements de pointe pour vous offrir une qualité irréprochable.</p>
+
+                <div class="about-features">
+                    <div class="feature-item">
+                        <i class="fa-solid fa-camera-retro"></i>
+                        <span id="feat1">Matériel Professionnel High-End</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i>
+                        <span id="feat2">Retouche Artistique Soignée</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="contact">
+        <div class="footer-content">
+            <div class="brand-logo">LENS <span>&</span> ART</div>
+            <p id="footerCopy">&copy; 2026 LENS & ART. Tous droits réservés.</p>
+        </div>
+    </footer>
+
+    <!-- Floating Direct Call Button -->
+    <a href="tel:+213550000000" class="floating-call-btn" aria-label="Call Now">
+        <i class="fa-solid fa-phone"></i>
+    </a>
+
+    <!-- Booking Modal -->
+    <div class="modal-backdrop" id="bookingModal">
+        <div class="modal-card">
+            <button class="modal-close-btn" onclick="closeModal()">&times;</button>
+            <div class="modal-header">
+                <h2 id="modalTitle">Réserver une séance photo</h2>
+                <p id="modalDesc">Complétez le formulaire ci-dessous pour réserver votre date.</p>
+            </div>
+            <form onsubmit="handleFormSubmit(event)">
+                <div class="form-group">
+                    <label id="lblNama">Nom complet</label>
+                    <input type="text" id="inputName" required placeholder="ex: Jean Dupont">
+                </div>
+                <div class="form-group">
+                    <label id="lblPhone">Numéro de téléphone</label>
+                    <input type="tel" id="inputPhone" required placeholder="0550 00 00 00">
+                </div>
+                <div class="form-group">
+                    <label id="lblType">Type de séance</label>
+                    <select id="inputType">
+                        <option id="optWedding" value="Wedding">Photographie de mariage</option>
+                        <option id="optPortrait" value="Portrait">Séance Portrait</option>
+                        <option id="optEvent" value="Event">Couverture d'événement</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-gold btn-full" id="btnSubmit">
+                    Confirmer la réservation
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyD0uoL6QS40S8Am8WYdLoFfxEsQuhqQPLQ",
+  authDomain: "photoshop-e8266.firebaseapp.com",
+  projectId: "photoshop-e8266",
+  storageBucket: "photoshop-e8266.firebasestorage.app",
+  messagingSenderId: "703007614918",
+  appId: "1:703007614918:web:31241b0b4830ec3681f4c7",
+  measurementId: "G-J1XE0B32HN"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
+</body>
+</html>
