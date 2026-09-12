@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LENS & ART - Studio De Photographie</title>
+    <title>LENS & ART | Fine Art Photography</title>
 
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -15,20 +15,19 @@
 
     <style>
         :root {
-            --bg-dark: #07080a;
-            --bg-card: rgba(18, 20, 26, 0.75);
-            --bg-glass: rgba(255, 255, 255, 0.03);
+            --bg-dark: #0f1115;
+            --bg-card: rgba(22, 25, 32, 0.85);
+            --bg-glass: rgba(255, 255, 255, 0.04);
             --accent-gold: #d4af37;
             --accent-gold-light: #f3e5ab;
             --accent-gradient: linear-gradient(135deg, #d4af37 0%, #aa7c11 100%);
             --text-main: #f8f9fa;
-            --text-muted: #a0a5b1;
-            --border-gold: rgba(212, 175, 55, 0.25);
+            --text-muted: #9aa0a6;
+            --border-gold: rgba(212, 175, 55, 0.3);
             --border-subtle: rgba(255, 255, 255, 0.08);
             --font-fr: 'Plus Jakarta Sans', sans-serif;
             --font-ar: 'Cairo', sans-serif;
             --font-serif: 'Playfair Display', serif;
-            --shadow-gold: 0 10px 30px rgba(212, 175, 55, 0.15);
         }
 
         * {
@@ -49,17 +48,28 @@
             font-family: var(--font-ar);
         }
 
-        /* Ambient Glow Effect */
-        .ambient-glow {
+        /* Floating Contact Button */
+        .floating-call {
             position: fixed;
-            top: -150px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 600px;
-            height: 600px;
-            background: radial-gradient(circle, rgba(212, 175, 55, 0.12) 0%, rgba(0, 0, 0, 0) 70%);
-            pointer-events: none;
-            z-index: 0;
+            bottom: 30px;
+            right: 30px;
+            width: 55px;
+            height: 55px;
+            background: #25d366;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: 0 10px 25px rgba(37, 211, 102, 0.4);
+            z-index: 999;
+            text-decoration: none;
+            transition: transform 0.3s;
+        }
+
+        .floating-call:hover {
+            transform: scale(1.1);
         }
 
         /* Navbar */
@@ -73,25 +83,18 @@
             left: 0;
             right: 0;
             z-index: 100;
-            background: rgba(7, 8, 10, 0.85);
+            background: rgba(15, 17, 21, 0.85);
             backdrop-filter: blur(16px);
             border-bottom: 1px solid var(--border-subtle);
         }
 
         .logo {
             font-family: var(--font-serif);
-            font-size: 1.6rem;
+            font-size: 1.5rem;
             font-weight: 700;
-            letter-spacing: 3px;
+            letter-spacing: 2px;
             color: var(--text-main);
             text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .logo i {
-            color: var(--accent-gold);
         }
 
         .nav-links {
@@ -106,7 +109,6 @@
             text-decoration: none;
             transition: all 0.3s ease;
             font-size: 0.95rem;
-            letter-spacing: 0.5px;
         }
 
         .nav-links a:hover {
@@ -117,7 +119,7 @@
             background: var(--bg-glass);
             border: 1px solid var(--border-gold);
             color: var(--accent-gold-light);
-            padding: 0.55rem 1.3rem;
+            padding: 0.5rem 1.2rem;
             border-radius: 30px;
             cursor: pointer;
             transition: all 0.3s ease;
@@ -130,7 +132,6 @@
         .btn-lang:hover {
             background: var(--accent-gold);
             color: #000;
-            box-shadow: var(--shadow-gold);
         }
 
         /* Hero Section */
@@ -142,44 +143,40 @@
             text-align: center;
             padding: 8rem 1.5rem 4rem;
             position: relative;
-            background: linear-gradient(180deg, rgba(7, 8, 10, 0.6) 0%, rgba(7, 8, 10, 0.95) 100%),
+            background: linear-gradient(180deg, rgba(15, 17, 21, 0.7) 0%, rgba(15, 17, 21, 0.95) 100%),
                         url('https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?auto=format&fit=crop&w=1920&q=80') center/cover no-repeat fixed;
         }
 
         .hero-content {
             max-width: 850px;
-            z-index: 1;
         }
 
         .tagline {
             color: var(--accent-gold);
-            letter-spacing: 4px;
+            letter-spacing: 3px;
             font-size: 0.85rem;
             font-weight: 700;
-            margin-bottom: 1.2rem;
+            margin-bottom: 1rem;
             text-transform: uppercase;
         }
 
         .hero h1 {
             font-family: var(--font-serif);
             font-size: 3.8rem;
-            line-height: 1.25;
+            line-height: 1.2;
             margin-bottom: 1.5rem;
-            font-weight: 700;
         }
 
         .text-accent {
-            background: var(--accent-gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: var(--accent-gold);
             font-style: italic;
         }
 
         .hero p {
             color: var(--text-muted);
-            font-size: 1.15rem;
-            margin-bottom: 2.8rem;
-            max-width: 650px;
+            font-size: 1.1rem;
+            margin-bottom: 2.5rem;
+            max-width: 600px;
             margin-left: auto;
             margin-right: auto;
         }
@@ -192,9 +189,9 @@
         }
 
         .btn-primary {
-            background: var(--accent-gradient);
+            background: var(--accent-gold);
             color: #0a0b0d;
-            padding: 1rem 2.2rem;
+            padding: 0.9rem 2.2rem;
             border-radius: 30px;
             border: none;
             font-weight: 700;
@@ -202,21 +199,17 @@
             cursor: pointer;
             text-decoration: none;
             transition: all 0.3s ease;
-            box-shadow: var(--shadow-gold);
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
         }
 
         .btn-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 35px rgba(212, 175, 55, 0.3);
+            background: #b89628;
+            transform: translateY(-2px);
         }
 
         .btn-secondary {
             background: var(--bg-glass);
             color: var(--text-main);
-            padding: 1rem 2.2rem;
+            padding: 0.9rem 2.2rem;
             border-radius: 30px;
             border: 1px solid var(--border-subtle);
             font-weight: 600;
@@ -224,40 +217,34 @@
             cursor: pointer;
             text-decoration: none;
             transition: all 0.3s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
         }
 
-        .btn-secondary:hover {
-            border-color: var(--border-gold);
-            background: rgba(255, 255, 255, 0.08);
-            color: var(--accent-gold-light);
-        }
-
-        /* Gallery Section */
-        .gallery-section {
-            padding: 7rem 6%;
-            position: relative;
+        /* Works Section (Gallery) */
+        .works-section {
+            padding: 6rem 6%;
+            background: var(--bg-dark);
         }
 
         .section-header {
             text-align: center;
-            margin-bottom: 4.5rem;
-        }
-
-        .section-header .sub {
-            color: var(--accent-gold);
-            font-size: 0.85rem;
-            letter-spacing: 3px;
-            margin-bottom: 0.6rem;
-            font-weight: 700;
+            margin-bottom: 4rem;
         }
 
         .section-header h2 {
             font-family: var(--font-serif);
             font-size: 2.8rem;
             font-weight: 700;
+            position: relative;
+            display: inline-block;
+        }
+
+        .section-header h2::after {
+            content: '';
+            display: block;
+            width: 50px;
+            height: 2px;
+            background: var(--accent-gold);
+            margin: 15px auto 0;
         }
 
         .gallery-grid {
@@ -270,28 +257,20 @@
             position: relative;
             border-radius: 16px;
             overflow: hidden;
-            height: 420px;
+            height: 400px;
             background: var(--bg-card);
             border: 1px solid var(--border-subtle);
-            backdrop-filter: blur(10px);
-            transition: all 0.4s ease;
-        }
-
-        .gallery-card:hover {
-            border-color: var(--border-gold);
-            transform: translateY(-8px);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
         }
 
         .gallery-card img {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            transition: transform 0.6s ease;
+            transition: transform 0.5s ease;
         }
 
         .gallery-card:hover img {
-            transform: scale(1.08);
+            transform: scale(1.05);
         }
 
         .card-overlay {
@@ -299,26 +278,117 @@
             bottom: 0;
             left: 0;
             right: 0;
-            padding: 2.5rem 1.8rem 1.8rem;
-            background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(7, 8, 10, 0.95) 100%);
-            color: #fff;
+            padding: 2rem 1.5rem 1.5rem;
+            background: linear-gradient(transparent, rgba(0, 0, 0, 0.9));
         }
 
         .card-overlay .category {
             font-size: 0.75rem;
             color: var(--accent-gold);
-            letter-spacing: 1.5px;
+            letter-spacing: 1px;
             text-transform: uppercase;
             font-weight: 600;
         }
 
         .card-overlay h3 {
-            font-family: var(--font-serif);
-            font-size: 1.4rem;
+            font-size: 1.3rem;
             margin-top: 0.3rem;
         }
 
-        /* Booking Modal */
+        /* About Section */
+        .about-section {
+            padding: 6rem 6%;
+            background: #121419;
+            border-top: 1px solid var(--border-subtle);
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .about-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .about-image-wrapper {
+            position: relative;
+        }
+
+        .about-img {
+            width: 100%;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            display: block;
+        }
+
+        .experience-badge {
+            position: absolute;
+            bottom: -20px;
+            right: -20px;
+            background: #f3e5ab;
+            color: #000;
+            padding: 1.2rem 1.8rem;
+            border-radius: 16px;
+            font-weight: 700;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+
+        .experience-badge .num {
+            font-size: 1.8rem;
+            line-height: 1;
+            display: block;
+        }
+
+        .experience-badge .text {
+            font-size: 0.75rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .about-content .sub {
+            color: var(--accent-gold);
+            font-size: 0.85rem;
+            letter-spacing: 2px;
+            font-weight: 700;
+            margin-bottom: 0.8rem;
+            text-transform: uppercase;
+        }
+
+        .about-content h2 {
+            font-family: var(--font-serif);
+            font-size: 2.6rem;
+            line-height: 1.25;
+            margin-bottom: 1.5rem;
+        }
+
+        .about-content p {
+            color: var(--text-muted);
+            margin-bottom: 1.2rem;
+            font-size: 0.98rem;
+        }
+
+        .about-features {
+            list-style: none;
+            margin-top: 1.8rem;
+        }
+
+        .about-features li {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 0.8rem;
+            color: var(--text-main);
+            font-weight: 500;
+        }
+
+        .about-features i {
+            color: var(--accent-gold);
+        }
+
+        /* Modal */
         .modal {
             display: none;
             position: fixed;
@@ -326,12 +396,11 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(4, 5, 7, 0.85);
-            backdrop-filter: blur(12px);
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
             z-index: 1000;
             align-items: center;
             justify-content: center;
-            padding: 1.5rem;
         }
 
         .modal.active {
@@ -339,69 +408,61 @@
         }
 
         .modal-content {
-            background: #111318;
+            background: #161920;
             border: 1px solid var(--border-gold);
-            padding: 2.8rem;
+            padding: 2.5rem;
             border-radius: 20px;
-            max-width: 520px;
-            width: 100%;
+            max-width: 500px;
+            width: 90%;
             position: relative;
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.8);
         }
 
         .close-btn {
             position: absolute;
-            top: 1.5rem;
-            right: 1.8rem;
+            top: 1.2rem;
+            right: 1.5rem;
             font-size: 1.5rem;
             color: var(--text-muted);
             cursor: pointer;
-            transition: color 0.3s;
-        }
-
-        .close-btn:hover {
-            color: var(--accent-gold);
         }
 
         .form-group {
-            margin-bottom: 1.3rem;
+            margin-bottom: 1.2rem;
         }
 
         .form-group label {
             display: block;
             margin-bottom: 0.5rem;
             color: var(--text-muted);
-            font-size: 0.88rem;
-            font-weight: 500;
+            font-size: 0.9rem;
         }
 
         .form-group input, .form-group select {
             width: 100%;
-            padding: 0.85rem 1.1rem;
-            background: rgba(255, 255, 255, 0.04);
+            padding: 0.8rem 1rem;
+            background: rgba(255, 255, 255, 0.05);
             border: 1px solid var(--border-subtle);
-            border-radius: 10px;
+            border-radius: 8px;
             color: var(--text-main);
             outline: none;
-            font-family: inherit;
-            transition: border-color 0.3s;
-        }
-
-        .form-group input:focus, .form-group select:focus {
-            border-color: var(--accent-gold);
         }
 
         .form-group select option {
-            background: #111318;
+            background: #161920;
             color: var(--text-main);
         }
 
         footer {
             text-align: center;
             padding: 2.5rem;
-            border-top: 1px solid var(--border-subtle);
             color: var(--text-muted);
             font-size: 0.9rem;
+        }
+
+        @media (max-width: 900px) {
+            .about-container {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 
@@ -411,13 +472,16 @@
 </head>
 <body>
 
-    <div class="ambient-glow"></div>
+    <!-- Floating WhatsApp/Call Button -->
+    <a href="tel:+213000000000" class="floating-call"><i class="fa-solid fa-phone"></i></a>
 
+    <!-- Navbar -->
     <nav class="navbar">
-        <a href="#" class="logo"><i class="fa-solid fa-camera-retro"></i> LENS & ART</a>
+        <a href="#" class="logo">LENS & ART</a>
         <ul class="nav-links">
             <li><a href="#gallery" id="navGallery">Galerie</a></li>
             <li><a href="#about" id="navAbout">À Propos</a></li>
+            <li><a href="#contact" id="navContact">Contact</a></li>
             <li><a href="admine.html">Admin</a></li>
         </ul>
         <div class="nav-btns">
@@ -425,40 +489,65 @@
         </div>
     </nav>
 
+    <!-- Hero Section -->
     <section class="hero">
         <div class="hero-content">
             <div class="tagline" id="heroTagline">STUDIO DE PHOTOGRAPHIE HAUT DE GAMME</div>
             <h1 id="heroTitle">Saisir Des Moments <br><span class="text-accent">Intemporels</span></h1>
             <p id="heroDesc">Photographie d'art pour mariages, portraits de prestige et événements.</p>
             <div class="hero-btns">
-                <button class="btn-primary" id="btnBook" onclick="openModal()"><i class="fa-solid fa-calendar-check"></i> Réserver une séance</button>
-                <a href="tel:+213000000000" class="btn-secondary" id="btnCall"><i class="fa-solid fa-phone"></i> Appeler maintenant</a>
+                <button class="btn-primary" id="btnBook" onclick="openModal()">Réserver une séance</button>
+                <a href="tel:+213000000000" class="btn-secondary" id="btnCall">Appeler maintenant</a>
             </div>
         </div>
     </section>
 
-    <section class="gallery-section" id="gallery">
+    <!-- Works / Gallery Section -->
+    <section class="works-section" id="gallery">
         <div class="section-header">
-            <div class="sub" id="gallerySub">PORTFOLIO</div>
             <h2 id="galleryTitle">Travaux Récents</h2>
         </div>
         <div class="gallery-grid" id="galleryGrid"></div>
     </section>
 
+    <!-- About Section -->
+    <section class="about-section" id="about">
+        <div class="about-container">
+            <div class="about-image-wrapper">
+                <img src="https://images.unsplash.com/photo-1554048612-b6a482bc67e5?auto=format&fit=crop&w=800&q=80" alt="Photographer" class="about-img">
+                <div class="experience-badge">
+                    <span class="num">10+</span>
+                    <span class="text">Ans d'expérience</span>
+                </div>
+            </div>
+            <div class="about-content">
+                <div class="sub" id="aboutSub">À PROPOS DE NOUS</div>
+                <h2 id="aboutTitle">Capturer L'Émotion Avec Passion & Précision</h2>
+                <p id="aboutDesc1">Fondé sur une passion pour l'art visuel et le storytelling, notre studio s'efforce de capturer la véritable essence de vos moments les plus précieux. Nous croyons que chaque photographie doit raconter une histoire intemporelle.</p>
+                <p id="aboutDesc2">Que ce soit pour votre mariage, un portrait professionnel ou un événement d'exception, nous combinons une approche artistique raffinée avec des équipements de pointe pour vous offrir une qualité irréprochable.</p>
+                <ul class="about-features">
+                    <li id="feat1"><i class="fa-solid fa-camera"></i> Matériel Professionnel High-End</li>
+                    <li id="feat2"><i class="fa-solid fa-wand-magic-sparkles"></i> Retouche Artistique Soignée</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Booking Modal -->
     <div class="modal" id="bookingModal">
         <div class="modal-content">
             <span class="close-btn" onclick="closeModal()">&times;</span>
-            <h3 id="modalTitle" style="margin-bottom: 0.4rem; font-family: var(--font-serif); font-size: 1.6rem;">Réserver une séance photo</h3>
-            <p id="modalDesc" style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 1.8rem;">Complétez le formulaire ci-dessous pour réserver votre date.</p>
+            <h3 id="modalTitle" style="margin-bottom: 0.5rem; font-family: var(--font-serif); font-size: 1.5rem;">Réserver une séance photo</h3>
+            <p id="modalDesc" style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 1.5rem;">Complétez le formulaire ci-dessous pour réserver votre date.</p>
 
             <form onsubmit="handleFormSubmit(event)">
                 <div class="form-group">
                     <label id="lblNama">Nom complet</label>
-                    <input type="text" id="inputName" required placeholder="Votre nom">
+                    <input type="text" id="inputName" required>
                 </div>
                 <div class="form-group">
                     <label id="lblPhone">Numéro de téléphone</label>
-                    <input type="tel" id="inputPhone" required placeholder="06XX XX XX XX">
+                    <input type="tel" id="inputPhone" required>
                 </div>
                 <div class="form-group">
                     <label id="lblType">Type de séance</label>
@@ -468,7 +557,7 @@
                     <label id="lblDateTime">Date et Heure de la séance</label>
                     <input type="datetime-local" id="inputDateTime" required>
                 </div>
-                <button type="submit" class="btn-primary" id="btnSubmit" style="width: 100%; margin-top: 1rem; justify-content: center;">Confirmer la réservation</button>
+                <button type="submit" class="btn-primary" id="btnSubmit" style="width: 100%; margin-top: 1rem;">Confirmer la réservation</button>
             </form>
         </div>
     </div>
@@ -477,7 +566,7 @@
         <p id="footerCopy">© 2026 LENS & ART. Tous droits réservés.</p>
     </footer>
 
-    <!-- Main Logic -->
+    <!-- Script Logic -->
     <script src="script.js"></script>
 </body>
 </html>
