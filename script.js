@@ -1,4 +1,4 @@
-// Firebase Config
+// Firebase Configuration
 const firebaseConfig = {
     apiKey: "AIzaSyD0uoL6QS40S8Am8WYdLoFfxEsQuhqQPLQ",
     authDomain: "photoshop-e8266.firebaseapp.com",
@@ -121,7 +121,7 @@ function applyLanguage(lang) {
     renderGallery();
 }
 
-// Modal Functions
+// Modal Controls
 function openModal() {
     const modal = document.getElementById('bookingModal');
     if (modal) modal.classList.add('active');
@@ -139,12 +139,16 @@ window.onclick = function(event) {
     if (event.target === modal) closeModal();
 };
 
-// Firestore Listeners
+// Real-time Session Types Listener
 function listenToSessionTypes() {
     db.collection("session_types").onSnapshot((snapshot) => {
         cachedSessionTypes = [];
-        snapshot.forEach((doc) => cachedSessionTypes.push(doc.data()));
+        snapshot.forEach((doc) => {
+            cachedSessionTypes.push({ id: doc.id, ...doc.data() });
+        });
         renderSessionOptions();
+    }, (error) => {
+        console.error("Error loading session types:", error);
     });
 }
 
@@ -153,19 +157,34 @@ function renderSessionOptions() {
     if (!select) return;
 
     select.innerHTML = '';
+    
+    if (cachedSessionTypes.length === 0) {
+        const defaultOpt = document.createElement('option');
+        defaultOpt.value = "";
+        defaultOpt.innerText = currentLang === 'ar' ? "لا توجد خيارات متاحة" : "Aucun type disponible";
+        select.appendChild(defaultOpt);
+        return;
+    }
+
     cachedSessionTypes.forEach(session => {
         const option = document.createElement('option');
-        option.value = session.fr;
-        option.innerText = currentLang === 'ar' ? session.ar : session.fr;
+        // Store French name as value, display language dynamically
+        option.value = session.fr || session.name || "";
+        option.innerText = (currentLang === 'ar' ? session.ar : session.fr) || session.name || "";
         select.appendChild(option);
     });
 }
 
+// Real-time Categories Listener
 function listenToCategories() {
     db.collection("categories").onSnapshot((snapshot) => {
         cachedCategories = [];
-        snapshot.forEach((doc) => cachedCategories.push(doc.data()));
+        snapshot.forEach((doc) => {
+            cachedCategories.push({ id: doc.id, ...doc.data() });
+        });
         renderGallery();
+    }, (error) => {
+        console.error("Error loading categories:", error);
     });
 }
 
@@ -175,7 +194,7 @@ function renderGallery() {
     grid.innerHTML = '';
 
     cachedCategories.forEach(item => {
-        const catName = currentLang === 'ar' ? item.ar : item.fr;
+        const catName = (currentLang === 'ar' ? item.ar : item.fr) || item.name || "";
         grid.innerHTML += `
             <div class="gallery-card">
                 <img src="https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=80" alt="${catName}">
@@ -188,7 +207,7 @@ function renderGallery() {
     });
 }
 
-// Form Handlers
+// Booking Form Submit
 async function handleFormSubmit(event) {
     event.preventDefault();
     const nameInput = document.getElementById('inputName').value.trim();
