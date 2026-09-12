@@ -1,30 +1,22 @@
-// Firebase Configuration
-const firebaseConfig = {
-    apiKey: "AIzaSyD0uoL6QS40S8Am8WYdLoFfxEsQuhqQPLQ",
-    authDomain: "photoshop-e8266.firebaseapp.com",
-    projectId: "photoshop-e8266",
-    storageBucket: "photoshop-e8266.firebasestorage.app",
-    messagingSenderId: "703007614918",
-    appId: "1:703007614918:web:31241b0b4830ec3681f4c7",
-    measurementId: "G-J1XE0B32HN"
-};
-
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
-
-// Site Translations
-const defaultTranslations = {
+// Language Translations
+const translations = {
     fr: {
-        langBtn: "العربية",
         navGallery: "Galerie",
         navAbout: "À Propos",
+        navContact: "Contact",
         heroTagline: "STUDIO DE PHOTOGRAPHIE HAUT DE GAMME",
-        heroTitle: "Saisir Des Moments <br><span class='text-accent'>Intemporels</span>",
+        heroTitle: 'Saisir Des Moments <br><span class="text-accent">Intemporels</span>',
         heroDesc: "Photographie d'art pour mariages, portraits de prestige et événements.",
         btnBook: "Réserver une séance",
         btnCall: "Appeler maintenant",
-        gallerySub: "PORTFOLIO",
         galleryTitle: "Travaux Récents",
+        aboutSub: "À PROPOS DE NOUS",
+        aboutTitle: "Capturer L'Émotion Avec Passion & Précision",
+        aboutDesc1: "Fondé sur une passion pour l'art visuel et le storytelling, notre studio s'efforce de capturer la véritable essence de vos moments les plus précieux. Nous croyons que chaque photographie doit raconter une histoire intemporelle.",
+        aboutDesc2: "Que ce soit pour votre mariage, un portrait professionnel ou un événement d'exception, nous combinons une approche artistique raffinée avec des équipements de pointe pour vous offrir une qualité irréprochable.",
+        feat1: '<i class="fa-solid fa-camera"></i> Matériel Professionnel High-End',
+        feat2: '<i class="fa-solid fa-wand-magic-sparkles"></i> Retouche Artistique Soignée',
+        langBtn: '<i class="fa-solid fa-globe"></i> <span>العربية</span>',
         modalTitle: "Réserver une séance photo",
         modalDesc: "Complétez le formulaire ci-dessous pour réserver votre date.",
         lblNama: "Nom complet",
@@ -32,203 +24,98 @@ const defaultTranslations = {
         lblType: "Type de séance",
         lblDateTime: "Date et Heure de la séance",
         btnSubmit: "Confirmer la réservation",
-        footerCopy: "© 2026 LENS & ART. Tous droits réservés.",
-        alertMsg: "Merci! Votre demande de réservation a été envoyée."
+        types: ["Mariage", "Portrait", "Événement", "Autre"]
     },
     ar: {
-        langBtn: "Français",
-        navGallery: "معرض الصور",
+        navGallery: "المعرض",
         navAbout: "من نحن",
+        navContact: "اتصل بنا",
         heroTagline: "استوديو تصوير فوتوغرافي فاخر",
-        heroTitle: "تخليد أجمـل <br><span class='text-accent'>اللحظات</span>",
-        heroDesc: "تصوير احترافي للأعراس، البورتوريه الفاخر، والمناسبات.",
+        heroTitle: 'تخليد اللحظات <br><span class="text-accent">الخالدة</span>',
+        heroDesc: "تصوير فني للأعراس، البورتريهات الفاخرة والمناسبات الخاصة.",
         btnBook: "حجز جلسة تصوير",
-        btnCall: "اتصل الآن",
-        gallerySub: "معرض الأعمال",
-        galleryTitle: "أحدث الأعمال",
-        modalTitle: "حجز جلسة تصوير جديدة",
-        modalDesc: "يرجى ملء النموذج أدناه لتأكيد موعد الجلسة.",
+        btnCall: "اتصل بنا الآن",
+        galleryTitle: "أعمالنا الأخيرة",
+        aboutSub: "من نحن",
+        aboutTitle: "نلتقط المشاعر بشغف ودقة",
+        aboutDesc1: "تأسس استوديونا على شغف بالفن البصري وسرد القصص، ونسعى للتقاط الجوهر الحقيقي لأغلى لحظاتكم. نؤمن بأن كل صورة يجب أن تحكي قصة لا تُنسى.",
+        aboutDesc2: "سواء كان لحفل زفافك، بورترييه احترافي، أو مناسبة خاصة، نحن نجمع بين اللمسة الفنية الراقية وأحدث المعدات لنقدم لك جودة لا مثيل لها.",
+        feat1: '<i class="fa-solid fa-camera"></i> معدات احترافية عالية الجودة',
+        feat2: '<i class="fa-solid fa-wand-magic-sparkles"></i> تعديل فني دقيق',
+        langBtn: '<i class="fa-solid fa-globe"></i> <span>Français</span>',
+        modalTitle: "حجز جلسة تصوير",
+        modalDesc: "يرجى ملء النموذج أدناه لحجز موعدك.",
         lblNama: "الاسم الكامل",
         lblPhone: "رقم الهاتف",
         lblType: "نوع الجلسة",
         lblDateTime: "تاريخ ووقت الجلسة",
         btnSubmit: "تأكيد الحجز",
-        footerCopy: "© 2026 LENS & ART. جميع الحقوق محفوظة.",
-        alertMsg: "شكراً لك! تم استلام طلب الحجز بنجاح."
+        types: ["زفاف", "بورتريه", "مناسبة", "آخر"]
     }
 };
 
 let currentLang = 'fr';
-let cachedSessionTypes = [];
-let cachedCategories = [];
 
-// Initialize Page
-document.addEventListener("DOMContentLoaded", () => {
-    applyLanguage(currentLang);
-    listenToSessionTypes();
-    listenToCategories();
-});
-
-// Toggle Language Logic
 function toggleLanguage() {
     currentLang = currentLang === 'fr' ? 'ar' : 'fr';
-    applyLanguage(currentLang);
-}
-window.toggleLanguage = toggleLanguage;
+    document.documentElement.setAttribute('dir', currentLang === 'ar' ? 'rtl' : 'ltr');
+    document.documentElement.setAttribute('lang', currentLang);
+    
+    const t = translations[currentLang];
+    
+    document.getElementById('navGallery').innerText = t.navGallery;
+    document.getElementById('navAbout').innerText = t.navAbout;
+    document.getElementById('navContact').innerText = t.navContact;
+    document.getElementById('heroTagline').innerText = t.heroTagline;
+    document.getElementById('heroTitle').innerHTML = t.heroTitle;
+    document.getElementById('heroDesc').innerText = t.heroDesc;
+    document.getElementById('btnBook').innerText = t.btnBook;
+    document.getElementById('btnCall').innerText = t.btnCall;
+    document.getElementById('galleryTitle').innerText = t.galleryTitle;
+    document.getElementById('aboutSub').innerText = t.aboutSub;
+    document.getElementById('aboutTitle').innerText = t.aboutTitle;
+    document.getElementById('aboutDesc1').innerText = t.aboutDesc1;
+    document.getElementById('aboutDesc2').innerText = t.aboutDesc2;
+    document.getElementById('feat1').innerHTML = t.feat1;
+    document.getElementById('feat2').innerHTML = t.feat2;
+    document.getElementById('langToggle').innerHTML = t.langBtn;
+    document.getElementById('modalTitle').innerText = t.modalTitle;
+    document.getElementById('modalDesc').innerText = t.modalDesc;
+    document.getElementById('lblNama').innerText = t.lblNama;
+    document.getElementById('lblPhone').innerText = t.lblPhone;
+    document.getElementById('lblType').innerText = t.lblType;
+    document.getElementById('lblDateTime').innerText = t.lblDateTime;
+    document.getElementById('btnSubmit').innerText = t.btnSubmit;
 
-function applyLanguage(lang) {
-    const html = document.documentElement;
-    html.setAttribute('lang', lang);
-    html.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
-
-    const data = defaultTranslations[lang];
-
-    const langBtn = document.getElementById('langToggle');
-    if (langBtn) {
-        const span = langBtn.querySelector('span');
-        if (span) span.innerText = data.langBtn;
-        else langBtn.innerText = data.langBtn;
-    }
-
-    const elementMap = {
-        'navGallery': data.navGallery,
-        'navAbout': data.navAbout,
-        'heroTagline': data.heroTagline,
-        'heroDesc': data.heroDesc,
-        'btnBook': data.btnBook,
-        'btnCall': data.btnCall,
-        'gallerySub': data.gallerySub,
-        'galleryTitle': data.galleryTitle,
-        'modalTitle': data.modalTitle,
-        'modalDesc': data.modalDesc,
-        'lblNama': data.lblNama,
-        'lblPhone': data.lblPhone,
-        'lblType': data.lblType,
-        'lblDateTime': data.lblDateTime,
-        'btnSubmit': data.btnSubmit,
-        'footerCopy': data.footerCopy
-    };
-
-    for (let id in elementMap) {
-        const el = document.getElementById(id);
-        if (el) el.innerText = elementMap[id];
-    }
-
-    const heroTitle = document.getElementById('heroTitle');
-    if (heroTitle) heroTitle.innerHTML = data.heroTitle;
-
-    renderSessionOptions();
-    renderGallery();
+    populateSelectTypes();
 }
 
-// Modal Controls
-function openModal() {
-    const modal = document.getElementById('bookingModal');
-    if (modal) modal.classList.add('active');
-}
-window.openModal = openModal;
-
-function closeModal() {
-    const modal = document.getElementById('bookingModal');
-    if (modal) modal.classList.remove('active');
-}
-window.closeModal = closeModal;
-
-window.onclick = function(event) {
-    const modal = document.getElementById('bookingModal');
-    if (event.target === modal) closeModal();
-};
-
-// Real-time Session Types Listener
-function listenToSessionTypes() {
-    db.collection("session_types").onSnapshot((snapshot) => {
-        cachedSessionTypes = [];
-        snapshot.forEach((doc) => {
-            cachedSessionTypes.push({ id: doc.id, ...doc.data() });
-        });
-        renderSessionOptions();
-    }, (error) => {
-        console.error("Error loading session types:", error);
-    });
-}
-
-function renderSessionOptions() {
+function populateSelectTypes() {
     const select = document.getElementById('inputType');
     if (!select) return;
-
     select.innerHTML = '';
-    
-    if (cachedSessionTypes.length === 0) {
-        const defaultOpt = document.createElement('option');
-        defaultOpt.value = "";
-        defaultOpt.innerText = currentLang === 'ar' ? "لا توجد خيارات متاحة" : "Aucun type disponible";
-        select.appendChild(defaultOpt);
-        return;
-    }
-
-    cachedSessionTypes.forEach(session => {
+    translations[currentLang].types.forEach(type => {
         const option = document.createElement('option');
-        // Store French name as value, display language dynamically
-        option.value = session.fr || session.name || "";
-        option.innerText = (currentLang === 'ar' ? session.ar : session.fr) || session.name || "";
+        option.value = type;
+        option.textContent = type;
         select.appendChild(option);
     });
 }
 
-// Real-time Categories Listener
-function listenToCategories() {
-    db.collection("categories").onSnapshot((snapshot) => {
-        cachedCategories = [];
-        snapshot.forEach((doc) => {
-            cachedCategories.push({ id: doc.id, ...doc.data() });
-        });
-        renderGallery();
-    }, (error) => {
-        console.error("Error loading categories:", error);
-    });
+function openModal() {
+    document.getElementById('bookingModal').classList.add('active');
 }
 
-function renderGallery() {
-    const grid = document.getElementById('galleryGrid');
-    if (!grid) return;
-    grid.innerHTML = '';
-
-    cachedCategories.forEach(item => {
-        const catName = (currentLang === 'ar' ? item.ar : item.fr) || item.name || "";
-        grid.innerHTML += `
-            <div class="gallery-card">
-                <img src="https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=80" alt="${catName}">
-                <div class="card-overlay">
-                    <span class="category">${catName}</span>
-                    <h3>${catName}</h3>
-                </div>
-            </div>
-        `;
-    });
+function closeModal() {
+    document.getElementById('bookingModal').classList.remove('active');
 }
 
-// Booking Form Submit
-async function handleFormSubmit(event) {
-    event.preventDefault();
-    const nameInput = document.getElementById('inputName').value.trim();
-    const phoneInput = document.getElementById('inputPhone').value.trim();
-    const typeSelect = document.getElementById('inputType');
-    const dateTimeInput = document.getElementById('inputDateTime').value;
-
-    try {
-        await db.collection("bookings").add({
-            name: nameInput,
-            phone: phoneInput,
-            type: typeSelect ? typeSelect.value : "",
-            bookedDateTime: dateTimeInput,
-            createdAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
-
-        alert(defaultTranslations[currentLang].alertMsg);
-        closeModal();
-        event.target.reset();
-    } catch (error) {
-        alert("Erreur: " + error.message);
-    }
+function handleFormSubmit(e) {
+    e.preventDefault();
+    alert(currentLang === 'fr' ? 'Réservation envoyée avec succès!' : 'تم إرسال طلب الحجز بنجاح!');
+    closeModal();
 }
-window.handleFormSubmit = handleFormSubmit;
+
+document.addEventListener('DOMContentLoaded', () => {
+    populateSelectTypes();
+});
