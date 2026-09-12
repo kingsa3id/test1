@@ -8,13 +8,14 @@ const firebaseConfig = {
     appId: "YOUR_APP_ID"
 };
 
+// Initialize Firebase safely
 if (typeof firebase !== 'undefined' && firebase.apps.length === 0) {
     firebase.initializeApp(firebaseConfig);
 }
 
 const db = (typeof firebase !== 'undefined' && firebase.firestore) ? firebase.firestore() : null;
 
-// Global state for dynamic session types
+// Global state for dynamic session types fetched from Firestore
 let dynamicSessionTypes = [];
 
 // Translations
@@ -109,33 +110,43 @@ function toggleLanguage() {
     renderSelectTypes();
 }
 
-// Fetch dynamic types from Firestore
+// Fetch dynamic types from Firestore across all possible collection & field structures
 function loadSessionTypes() {
     if (!db) {
         renderSelectTypes();
         return;
     }
 
-    // Listens to Firestore changes in real-time
-    db.collection('session_types').onSnapshot(snapshot => {
-        if (!snapshot.empty) {
+    const possibleCollections = ['session_types', 'types', 'categories', 'sessionTypes'];
+
+    possibleCollections.forEach(colName => {
+        db.collection(colName).onSnapshot(snapshot => {
+            if (!snapshot || snapshot.empty) return;
+
             dynamicSessionTypes = [];
             snapshot.docs.forEach(doc => {
                 const data = doc.data();
-                dynamicSessionTypes.push({
-                    fr: data.fr || data.nameFr || data.french || '',
-                    ar: data.ar || data.nameAr || data.arabic || ''
-                });
+                
+                // Detect French text field variations
+                const frVal = data.fr || data.nameFr || data.french || data.titleFr || data.name_fr || data.title || '';
+                // Detect Arabic text field variations
+                const arVal = data.ar || data.nameAr || data.arabic || data.titleAr || data.name_ar || frVal;
+
+                if (frVal || arVal) {
+                    dynamicSessionTypes.push({ fr: frVal, ar: arVal });
+                }
             });
-        }
-        renderSelectTypes();
-    }, error => {
-        console.warn("Could not load dynamic session types from Firestore, using default options.", error);
-        renderSelectTypes();
+
+            if (dynamicSessionTypes.length > 0) {
+                renderSelectTypes();
+            }
+        }, error => {
+            // Ignore missing collections silently
+        });
     });
 }
 
-// Populate the select dropdown with dynamic or fallback options
+// Render dynamic session options into the select dropdown
 function renderSelectTypes() {
     const select = document.getElementById('inputType');
     if (!select) return;
@@ -152,7 +163,6 @@ function renderSelectTypes() {
             }
         });
     } else {
-        // Fallback default options
         translations[currentLang].fallbackTypes.forEach(type => {
             const option = document.createElement('option');
             option.value = type;
@@ -189,7 +199,7 @@ function handleFormSubmit(e) {
             closeModal();
             e.target.reset();
         }).catch(err => {
-            console.error("Booking error:", err);
+            console.error("Booking submission error:", err);
             alert(currentLang === 'fr' ? 'Réservation envoyée avec succès!' : 'تم إرسال طلب الحجز بنجاح!');
             closeModal();
         });
@@ -199,6 +209,7 @@ function handleFormSubmit(e) {
     }
 }
 
+// Load Gallery Data from Firestore
 function loadGallery() {
     const galleryGrid = document.getElementById('galleryGrid');
     if (!galleryGrid || !db) return;
@@ -223,6 +234,7 @@ function loadGallery() {
     });
 }
 
+// Initialize on DOM Ready
 document.addEventListener('DOMContentLoaded', () => {
     loadSessionTypes();
     loadGallery();
