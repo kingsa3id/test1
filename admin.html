@@ -71,13 +71,12 @@
         <button class="tab-btn active" onclick="switchTab('sessionsPanel', this)">Types de Séance</button>
         <button class="tab-btn" onclick="switchTab('categoriesPanel', this)">Catégories</button>
         <button class="tab-btn" onclick="switchTab('bookingsPanel', this)">Réservations</button>
-        <button class="tab-btn" onclick="switchTab('textPanel', this)">Éditer les Textes</button>
     </div>
 
     <!-- Panel 1: Session Types Manager -->
     <div class="panel active" id="sessionsPanel">
         <h2 style="margin-bottom: 10px;">Gérer les Types de Séance</h2>
-        <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom: 20px;">Ajoutez, modifiez ou supprimez les types de séance affichés dans le formulaire de réservation.</p>
+        <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom: 20px;">Ajoutez, modifiez ou supprimez les types de séance.</p>
         
         <form onsubmit="handleSessionSubmit(event)" style="margin-bottom: 30px; background: rgba(255,255,255,0.02); padding: 20px; border-radius: 8px; border: 1px solid var(--border);">
             <input type="hidden" id="sessionId">
@@ -172,40 +171,7 @@
         </table>
     </div>
 
-    <!-- Panel 4: Site Text Editor -->
-    <div class="panel" id="textPanel">
-        <h2 style="margin-bottom: 20px;">Éditer les Titres & Textes</h2>
-        <form onsubmit="saveTranslationsLocal(event)">
-            <div class="form-grid">
-                <div>
-                    <h3 style="color:var(--accent-gold); margin-bottom:15px;">French (FR)</h3>
-                    <div class="form-group">
-                        <label>Hero Title</label>
-                        <input type="text" id="fr_heroTitle">
-                    </div>
-                    <div class="form-group">
-                        <label>Hero Description</label>
-                        <textarea id="fr_heroDesc" rows="3"></textarea>
-                    </div>
-                </div>
-                <div>
-                    <h3 style="color:var(--accent-gold); margin-bottom:15px;">Arabic (AR)</h3>
-                    <div class="form-group">
-                        <label>Hero Title</label>
-                        <input type="text" id="ar_heroTitle" dir="rtl">
-                    </div>
-                    <div class="form-group">
-                        <label>Hero Description</label>
-                        <textarea id="ar_heroDesc" rows="3" dir="rtl"></textarea>
-                    </div>
-                </div>
-            </div>
-            <button type="submit" class="save-btn">Enregistrer Localement</button>
-        </form>
-    </div>
-
     <script>
-        // Firebase Config
         const firebaseConfig = {
             apiKey: "AIzaSyD0uoL6QS40S8Am8WYdLoFfxEsQuhqQPLQ",
             authDomain: "photoshop-e8266.firebaseapp.com",
@@ -232,7 +198,7 @@
             tbody.innerHTML = '';
 
             if (snapshot.empty) {
-                seedDefaultSessions();
+                tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; padding:20px; color:var(--text-muted);">Aucun type de séance trouvé.</td></tr>';
                 return;
             }
 
@@ -253,18 +219,9 @@
                 `;
                 tbody.appendChild(tr);
             });
+        }, (error) => {
+            alert("Erreur Firebase (Session Types): " + error.message);
         });
-
-        async function seedDefaultSessions() {
-            const defaults = [
-                { fr: "Photographie de mariage", ar: "تصوير أعراس" },
-                { fr: "Séance Portrait", ar: "جلسة بورتوريه" },
-                { fr: "Couverture d'événement", ar: "تغطية مناسبات" }
-            ];
-            for (const item of defaults) {
-                await db.collection("session_types").add(item);
-            }
-        }
 
         async function handleSessionSubmit(e) {
             e.preventDefault();
@@ -272,15 +229,18 @@
             const fr = document.getElementById('sessionFr').value.trim();
             const ar = document.getElementById('sessionAr').value.trim();
 
-            if (id) {
-                await db.collection("session_types").doc(id).update({ fr, ar });
-                alert("Type de séance mis à jour.");
-            } else {
-                await db.collection("session_types").add({ fr, ar });
-                alert("Nouveau type de séance ajouté.");
+            try {
+                if (id) {
+                    await db.collection("session_types").doc(id).update({ fr, ar });
+                    alert("Type de séance mis à jour.");
+                } else {
+                    await db.collection("session_types").add({ fr, ar });
+                    alert("Nouveau type de séance ajouté.");
+                }
+                resetSessionForm();
+            } catch (error) {
+                alert("Erreur lors de l'enregistrement: " + error.message);
             }
-
-            resetSessionForm();
         }
 
         function editSession(id, fr, ar) {
@@ -301,7 +261,11 @@
 
         async function deleteSession(id) {
             if (confirm("Voulez-vous vraiment supprimer ce type de séance ?")) {
-                await db.collection("session_types").doc(id).delete();
+                try {
+                    await db.collection("session_types").doc(id).delete();
+                } catch (error) {
+                    alert("Erreur lors de la suppression: " + error.message);
+                }
             }
         }
 
@@ -311,7 +275,7 @@
             tbody.innerHTML = '';
 
             if (snapshot.empty) {
-                seedDefaultCategories();
+                tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; padding:20px; color:var(--text-muted);">Aucune catégorie trouvée.</td></tr>';
                 return;
             }
 
@@ -332,18 +296,9 @@
                 `;
                 tbody.appendChild(tr);
             });
+        }, (error) => {
+            alert("Erreur Firebase (Categories): " + error.message);
         });
-
-        async function seedDefaultCategories() {
-            const defaults = [
-                { fr: "Mariage", ar: "أعراس" },
-                { fr: "Portrait", ar: "بورتوريه" },
-                { fr: "Événement", ar: "مناسبات" }
-            ];
-            for (const item of defaults) {
-                await db.collection("categories").add(item);
-            }
-        }
 
         async function handleCategorySubmit(e) {
             e.preventDefault();
@@ -351,15 +306,18 @@
             const fr = document.getElementById('categoryFr').value.trim();
             const ar = document.getElementById('categoryAr').value.trim();
 
-            if (id) {
-                await db.collection("categories").doc(id).update({ fr, ar });
-                alert("Catégorie mise à jour.");
-            } else {
-                await db.collection("categories").add({ fr, ar });
-                alert("Nouvelle catégorie ajoutée.");
+            try {
+                if (id) {
+                    await db.collection("categories").doc(id).update({ fr, ar });
+                    alert("Catégorie mise à jour avec succès.");
+                } else {
+                    await db.collection("categories").add({ fr, ar });
+                    alert("Nouvelle catégorie ajoutée avec succès.");
+                }
+                resetCategoryForm();
+            } catch (error) {
+                alert("Erreur lors de l'enregistrement de la catégorie: " + error.message);
             }
-
-            resetCategoryForm();
         }
 
         function editCategory(id, fr, ar) {
@@ -380,7 +338,11 @@
 
         async function deleteCategory(id) {
             if (confirm("Voulez-vous vraiment supprimer cette catégorie ?")) {
-                await db.collection("categories").doc(id).delete();
+                try {
+                    await db.collection("categories").doc(id).delete();
+                } catch (error) {
+                    alert("Erreur lors de la suppression de la catégorie: " + error.message);
+                }
             }
         }
 
