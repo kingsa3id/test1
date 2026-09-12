@@ -11,21 +11,24 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-    <!-- Embedded CSS Styling -->
     <style>
         :root {
-            --bg-main: #0c0d0f;
-            --bg-card: #141619;
-            --accent: #d4af37;
-            --accent-hover: #b89628;
+            --bg-dark: #07080a;
+            --bg-card: rgba(18, 20, 26, 0.75);
+            --bg-glass: rgba(255, 255, 255, 0.03);
+            --accent-gold: #d4af37;
+            --accent-gold-light: #f3e5ab;
+            --accent-gradient: linear-gradient(135deg, #d4af37 0%, #aa7c11 100%);
             --text-main: #f8f9fa;
-            --text-muted: #9ba1a6;
-            --border: rgba(255, 255, 255, 0.08);
+            --text-muted: #a0a5b1;
+            --border-gold: rgba(212, 175, 55, 0.25);
+            --border-subtle: rgba(255, 255, 255, 0.08);
             --font-fr: 'Plus Jakarta Sans', sans-serif;
             --font-ar: 'Cairo', sans-serif;
             --font-serif: 'Playfair Display', serif;
+            --shadow-gold: 0 10px 30px rgba(212, 175, 55, 0.15);
         }
 
         * {
@@ -35,7 +38,7 @@
         }
 
         body {
-            background-color: var(--bg-main);
+            background-color: var(--bg-dark);
             color: var(--text-main);
             font-family: var(--font-fr);
             line-height: 1.6;
@@ -46,34 +49,54 @@
             font-family: var(--font-ar);
         }
 
+        /* Ambient Glow Effect */
+        .ambient-glow {
+            position: fixed;
+            top: -150px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(212, 175, 55, 0.12) 0%, rgba(0, 0, 0, 0) 70%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
         /* Navbar */
         .navbar {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 1.5rem 5%;
+            padding: 1.5rem 6%;
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             z-index: 100;
-            background: rgba(12, 13, 15, 0.85);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid var(--border);
+            background: rgba(7, 8, 10, 0.85);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border-subtle);
         }
 
         .logo {
             font-family: var(--font-serif);
-            font-size: 1.5rem;
+            font-size: 1.6rem;
             font-weight: 700;
-            letter-spacing: 2px;
+            letter-spacing: 3px;
             color: var(--text-main);
             text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo i {
+            color: var(--accent-gold);
         }
 
         .nav-links {
             display: flex;
-            gap: 2rem;
+            gap: 2.5rem;
             align-items: center;
             list-style: none;
         }
@@ -81,33 +104,33 @@
         .nav-links a {
             color: var(--text-muted);
             text-decoration: none;
-            transition: color 0.3s;
+            transition: all 0.3s ease;
             font-size: 0.95rem;
+            letter-spacing: 0.5px;
         }
 
         .nav-links a:hover {
-            color: var(--accent);
-        }
-
-        .nav-btns {
-            display: flex;
-            gap: 1rem;
-            align-items: center;
+            color: var(--accent-gold);
         }
 
         .btn-lang {
-            background: transparent;
-            border: 1px solid var(--border);
-            color: var(--text-main);
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
+            background: var(--bg-glass);
+            border: 1px solid var(--border-gold);
+            color: var(--accent-gold-light);
+            padding: 0.55rem 1.3rem;
+            border-radius: 30px;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.3s ease;
+            font-size: 0.88rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .btn-lang:hover {
-            border-color: var(--accent);
-            color: var(--accent);
+            background: var(--accent-gold);
+            color: #000;
+            box-shadow: var(--shadow-gold);
         }
 
         /* Hero Section */
@@ -117,129 +140,158 @@
             align-items: center;
             justify-content: center;
             text-align: center;
-            padding: 8rem 1rem 4rem;
+            padding: 8rem 1.5rem 4rem;
             position: relative;
-            background: linear-gradient(rgba(12, 13, 15, 0.75), rgba(12, 13, 15, 0.95)),
+            background: linear-gradient(180deg, rgba(7, 8, 10, 0.6) 0%, rgba(7, 8, 10, 0.95) 100%),
                         url('https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?auto=format&fit=crop&w=1920&q=80') center/cover no-repeat fixed;
         }
 
         .hero-content {
-            max-width: 800px;
+            max-width: 850px;
+            z-index: 1;
         }
 
         .tagline {
-            color: var(--accent);
-            letter-spacing: 3px;
+            color: var(--accent-gold);
+            letter-spacing: 4px;
             font-size: 0.85rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
+            font-weight: 700;
+            margin-bottom: 1.2rem;
             text-transform: uppercase;
         }
 
         .hero h1 {
             font-family: var(--font-serif);
-            font-size: 3.5rem;
-            line-height: 1.2;
+            font-size: 3.8rem;
+            line-height: 1.25;
             margin-bottom: 1.5rem;
+            font-weight: 700;
         }
 
         .text-accent {
-            color: var(--accent);
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
             font-style: italic;
         }
 
         .hero p {
             color: var(--text-muted);
-            font-size: 1.1rem;
-            margin-bottom: 2.5rem;
+            font-size: 1.15rem;
+            margin-bottom: 2.8rem;
+            max-width: 650px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         .hero-btns {
             display: flex;
-            gap: 1rem;
+            gap: 1.2rem;
             justify-content: center;
             flex-wrap: wrap;
         }
 
         .btn-primary {
-            background: var(--accent);
-            color: #000;
-            padding: 0.9rem 2rem;
+            background: var(--accent-gradient);
+            color: #0a0b0d;
+            padding: 1rem 2.2rem;
             border-radius: 30px;
             border: none;
-            font-weight: 600;
+            font-weight: 700;
+            font-size: 0.95rem;
             cursor: pointer;
             text-decoration: none;
-            transition: transform 0.2s, background 0.3s;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-gold);
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
         }
 
         .btn-primary:hover {
-            background: var(--accent-hover);
-            transform: translateY(-2px);
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(212, 175, 55, 0.3);
         }
 
         .btn-secondary {
-            background: rgba(255, 255, 255, 0.05);
+            background: var(--bg-glass);
             color: var(--text-main);
-            padding: 0.9rem 2rem;
+            padding: 1rem 2.2rem;
             border-radius: 30px;
-            border: 1px solid var(--border);
+            border: 1px solid var(--border-subtle);
             font-weight: 600;
+            font-size: 0.95rem;
             cursor: pointer;
             text-decoration: none;
-            transition: background 0.3s;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
         }
 
         .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--border-gold);
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--accent-gold-light);
         }
 
         /* Gallery Section */
         .gallery-section {
-            padding: 6rem 5%;
+            padding: 7rem 6%;
+            position: relative;
         }
 
         .section-header {
             text-align: center;
-            margin-bottom: 4rem;
+            margin-bottom: 4.5rem;
         }
 
         .section-header .sub {
-            color: var(--accent);
+            color: var(--accent-gold);
             font-size: 0.85rem;
-            letter-spacing: 2px;
-            margin-bottom: 0.5rem;
+            letter-spacing: 3px;
+            margin-bottom: 0.6rem;
+            font-weight: 700;
         }
 
         .section-header h2 {
             font-family: var(--font-serif);
-            font-size: 2.5rem;
+            font-size: 2.8rem;
+            font-weight: 700;
         }
 
         .gallery-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
             gap: 2rem;
         }
 
         .gallery-card {
             position: relative;
-            border-radius: 12px;
+            border-radius: 16px;
             overflow: hidden;
-            height: 380px;
+            height: 420px;
             background: var(--bg-card);
-            border: 1px solid var(--border);
+            border: 1px solid var(--border-subtle);
+            backdrop-filter: blur(10px);
+            transition: all 0.4s ease;
+        }
+
+        .gallery-card:hover {
+            border-color: var(--border-gold);
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
         }
 
         .gallery-card img {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            transition: transform 0.5s ease;
+            transition: transform 0.6s ease;
         }
 
         .gallery-card:hover img {
-            transform: scale(1.05);
+            transform: scale(1.08);
         }
 
         .card-overlay {
@@ -247,16 +299,23 @@
             bottom: 0;
             left: 0;
             right: 0;
-            padding: 2rem 1.5rem 1.5rem;
-            background: linear-gradient(transparent, rgba(0, 0, 0, 0.9));
+            padding: 2.5rem 1.8rem 1.8rem;
+            background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(7, 8, 10, 0.95) 100%);
             color: #fff;
         }
 
         .card-overlay .category {
             font-size: 0.75rem;
-            color: var(--accent);
-            letter-spacing: 1px;
+            color: var(--accent-gold);
+            letter-spacing: 1.5px;
             text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        .card-overlay h3 {
+            font-family: var(--font-serif);
+            font-size: 1.4rem;
+            margin-top: 0.3rem;
         }
 
         /* Booking Modal */
@@ -267,11 +326,12 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(8px);
+            background: rgba(4, 5, 7, 0.85);
+            backdrop-filter: blur(12px);
             z-index: 1000;
             align-items: center;
             justify-content: center;
+            padding: 1.5rem;
         }
 
         .modal.active {
@@ -279,54 +339,67 @@
         }
 
         .modal-content {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            padding: 2.5rem;
-            border-radius: 16px;
-            max-width: 500px;
-            width: 90%;
+            background: #111318;
+            border: 1px solid var(--border-gold);
+            padding: 2.8rem;
+            border-radius: 20px;
+            max-width: 520px;
+            width: 100%;
             position: relative;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.8);
         }
 
         .close-btn {
             position: absolute;
-            top: 1.2rem;
-            right: 1.5rem;
+            top: 1.5rem;
+            right: 1.8rem;
             font-size: 1.5rem;
             color: var(--text-muted);
             cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .close-btn:hover {
+            color: var(--accent-gold);
         }
 
         .form-group {
-            margin-bottom: 1.2rem;
+            margin-bottom: 1.3rem;
         }
 
         .form-group label {
             display: block;
             margin-bottom: 0.5rem;
             color: var(--text-muted);
-            font-size: 0.9rem;
+            font-size: 0.88rem;
+            font-weight: 500;
         }
 
         .form-group input, .form-group select {
             width: 100%;
-            padding: 0.8rem 1rem;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--border);
-            border-radius: 8px;
+            padding: 0.85rem 1.1rem;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
             color: var(--text-main);
             outline: none;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            border-color: var(--accent-gold);
         }
 
         .form-group select option {
-            background: var(--bg-card);
+            background: #111318;
             color: var(--text-main);
         }
 
         footer {
             text-align: center;
-            padding: 2rem;
-            border-top: 1px solid var(--border);
+            padding: 2.5rem;
+            border-top: 1px solid var(--border-subtle);
             color: var(--text-muted);
             font-size: 0.9rem;
         }
@@ -338,15 +411,17 @@
 </head>
 <body>
 
+    <div class="ambient-glow"></div>
+
     <nav class="navbar">
-        <a href="#" class="logo">LENS & ART</a>
+        <a href="#" class="logo"><i class="fa-solid fa-camera-retro"></i> LENS & ART</a>
         <ul class="nav-links">
             <li><a href="#gallery" id="navGallery">Galerie</a></li>
             <li><a href="#about" id="navAbout">À Propos</a></li>
             <li><a href="admine.html">Admin</a></li>
         </ul>
         <div class="nav-btns">
-            <button class="btn-lang" id="langToggle" onclick="toggleLanguage()"><span>العربية</span></button>
+            <button class="btn-lang" id="langToggle" onclick="toggleLanguage()"><i class="fa-solid fa-globe"></i> <span>العربية</span></button>
         </div>
     </nav>
 
@@ -356,8 +431,8 @@
             <h1 id="heroTitle">Saisir Des Moments <br><span class="text-accent">Intemporels</span></h1>
             <p id="heroDesc">Photographie d'art pour mariages, portraits de prestige et événements.</p>
             <div class="hero-btns">
-                <button class="btn-primary" id="btnBook" onclick="openModal()">Réserver une séance</button>
-                <a href="tel:+213000000000" class="btn-secondary" id="btnCall">Appeler maintenant</a>
+                <button class="btn-primary" id="btnBook" onclick="openModal()"><i class="fa-solid fa-calendar-check"></i> Réserver une séance</button>
+                <a href="tel:+213000000000" class="btn-secondary" id="btnCall"><i class="fa-solid fa-phone"></i> Appeler maintenant</a>
             </div>
         </div>
     </section>
@@ -373,17 +448,17 @@
     <div class="modal" id="bookingModal">
         <div class="modal-content">
             <span class="close-btn" onclick="closeModal()">&times;</span>
-            <h3 id="modalTitle" style="margin-bottom: 0.5rem;">Réserver une séance photo</h3>
-            <p id="modalDesc" style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1.5rem;">Complétez le formulaire ci-dessous pour réserver votre date.</p>
+            <h3 id="modalTitle" style="margin-bottom: 0.4rem; font-family: var(--font-serif); font-size: 1.6rem;">Réserver une séance photo</h3>
+            <p id="modalDesc" style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 1.8rem;">Complétez le formulaire ci-dessous pour réserver votre date.</p>
 
             <form onsubmit="handleFormSubmit(event)">
                 <div class="form-group">
                     <label id="lblNama">Nom complet</label>
-                    <input type="text" id="inputName" required>
+                    <input type="text" id="inputName" required placeholder="Votre nom">
                 </div>
                 <div class="form-group">
                     <label id="lblPhone">Numéro de téléphone</label>
-                    <input type="tel" id="inputPhone" required>
+                    <input type="tel" id="inputPhone" required placeholder="06XX XX XX XX">
                 </div>
                 <div class="form-group">
                     <label id="lblType">Type de séance</label>
@@ -393,7 +468,7 @@
                     <label id="lblDateTime">Date et Heure de la séance</label>
                     <input type="datetime-local" id="inputDateTime" required>
                 </div>
-                <button type="submit" class="btn-primary" id="btnSubmit" style="width: 100%; margin-top: 1rem;">Confirmer la réservation</button>
+                <button type="submit" class="btn-primary" id="btnSubmit" style="width: 100%; margin-top: 1rem; justify-content: center;">Confirmer la réservation</button>
             </form>
         </div>
     </div>
