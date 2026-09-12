@@ -25,6 +25,7 @@ const defaultTranslations = {
         lblNama: "Nom complet",
         lblPhone: "Numéro de téléphone",
         lblType: "Type de séance",
+        lblDateTime: "Date et Heure de la séance", // Added translation
         optWedding: "Photographie de mariage",
         optPortrait: "Séance Portrait",
         optEvent: "Couverture d'événement",
@@ -56,6 +57,7 @@ const defaultTranslations = {
         lblNama: "الاسم الكامل",
         lblPhone: "رقم الهاتف",
         lblType: "نوع الجلسة",
+        lblDateTime: "تاريخ ووقت الجلسة", // Added translation
         optWedding: "تصوير أعراس",
         optPortrait: "جلسة بورتوريه",
         optEvent: "تغطية مناسبات",
@@ -130,6 +132,7 @@ function applyLanguage(lang) {
     document.getElementById('lblNama').innerText = data.lblNama;
     document.getElementById('lblPhone').innerText = data.lblPhone;
     document.getElementById('lblType').innerText = data.lblType;
+    document.getElementById('lblDateTime').innerText = data.lblDateTime; // Update new field language
     document.getElementById('optWedding').innerText = data.optWedding;
     document.getElementById('optPortrait').innerText = data.optPortrait;
     document.getElementById('optEvent').innerText = data.optEvent;
@@ -172,13 +175,14 @@ window.onclick = function(event) {
     if (event.target === modal) closeModal();
 };
 
-// Form submission handler -> Includes Anti-Spam & Validation
+// Form submission handler -> Includes Anti-Spam & Anti-Overlap Booking
 function handleFormSubmit(event) {
     event.preventDefault();
     
     const nameInput = document.getElementById('inputName').value.trim();
     const phoneInput = document.getElementById('inputPhone').value.trim();
     const typeInput = document.getElementById('inputType').value;
+    const dateTimeInput = document.getElementById('inputDateTime').value; // Get chosen date & time
 
     // 1. Anti-Fake: Validate Name (At least 3 characters)
     if (nameInput.length < 3) {
@@ -202,16 +206,25 @@ function handleFormSubmit(event) {
         return;
     }
 
+    // 4. Anti-Overlap: Check if the exact Date and Time is already booked
+    let existingBookings = JSON.parse(localStorage.getItem('site_bookings')) || [];
+    const isAlreadyBooked = existingBookings.some(b => b.bookedDateTime === dateTimeInput);
+
+    if (isAlreadyBooked) {
+        alert(currentLang === 'fr' ? "Ce créneau est déjà réservé. Veuillez choisir une autre date/heure." : "هذا الموعد محجوز مسبقاً. الرجاء اختيار وقت آخر.");
+        return; // Stop the booking process
+    }
+
     // Create the booking object
     const newBooking = {
         name: nameInput,
         phone: phoneInput,
         type: typeInput,
-        date: new Date().toLocaleString() // Saves exact time of booking
+        bookedDateTime: dateTimeInput, // Saves the time they want the session
+        submissionDate: new Date().toLocaleString() // Saves the time they filled the form
     };
 
     // Save to LocalStorage
-    let existingBookings = JSON.parse(localStorage.getItem('site_bookings')) || [];
     existingBookings.push(newBooking);
     localStorage.setItem('site_bookings', JSON.stringify(existingBookings));
     
