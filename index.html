@@ -452,6 +452,12 @@
             color: var(--text-main);
         }
 
+        /* Color adjust for date picker icon on dark theme */
+        input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+            cursor: pointer;
+        }
+
         footer {
             text-align: center;
             padding: 2.5rem;
@@ -554,7 +560,7 @@
                 </div>
                 <div class="form-group">
                     <label id="lblDateTime">Date et Heure de la séance</label>
-                    <input type="datetime-local" id="inputDateTime" required>
+                    <input type="datetime-local" id="inputDateTime" required onclick="this.showPicker()" style="cursor: pointer;">
                 </div>
                 <button type="submit" class="btn-primary" id="btnSubmit" style="width: 100%; margin-top: 1rem;">Confirmer la réservation</button>
             </form>
