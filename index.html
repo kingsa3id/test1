@@ -3,167 +3,154 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LENS & ART | Fine Art Photography</title>
-    
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- FontAwesome -->
+    <title>LENS & ART | Studio de Photographie</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
+    
+    <style>
+        :root {
+            --bg-dark: #0a0a0c;
+            --bg-card: #141418;
+            --accent-gold: #d4af37;
+            --text-main: #ffffff;
+            --text-muted: #8e8e93;
+            --border: rgba(255, 255, 255, 0.08);
+            --radius-md: 12px;
+            --transition: all 0.3s ease;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { background: var(--bg-dark); color: var(--text-main); line-height: 1.6; }
+        
+        header { display: flex; justify-content: space-between; align-items: center; padding: 25px 6%; position: fixed; top: 0; width: 100%; z-index: 100; background: rgba(10, 10, 12, 0.85); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); }
+        .logo { font-size: 1.4rem; font-weight: 700; letter-spacing: 2px; color: #fff; text-decoration: none; }
+        .logo span { color: var(--accent-gold); }
+        
+        nav { display: flex; gap: 25px; align-items: center; }
+        nav a { color: var(--text-muted); text-decoration: none; font-size: 0.9rem; font-weight: 600; transition: var(--transition); }
+        nav a:hover { color: var(--accent-gold); }
+        
+        .nav-actions { display: flex; gap: 15px; align-items: center; }
+        .lang-btn { background: rgba(255, 255, 255, 0.05); color: #fff; border: 1px solid var(--border); padding: 8px 16px; border-radius: 20px; cursor: pointer; font-weight: 600; font-size: 0.85rem; transition: var(--transition); display: flex; align-items: center; gap: 6px; }
+        .lang-btn:hover { border-color: var(--accent-gold); color: var(--accent-gold); }
+
+        .hero { padding: 180px 6% 100px; text-align: center; max-width: 900px; margin: 0 auto; }
+        .tagline { color: var(--accent-gold); font-size: 0.85rem; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 15px; display: block; }
+        .hero h1 { font-size: 3.5rem; font-weight: 700; line-height: 1.1; margin-bottom: 20px; }
+        .text-accent { color: var(--accent-gold); }
+        .hero p { color: var(--text-muted); font-size: 1.1rem; margin-bottom: 35px; }
+
+        .btn-group { display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; }
+        .btn-primary { background: var(--accent-gold); color: #000; padding: 14px 28px; border-radius: 30px; text-decoration: none; font-weight: 700; border: none; cursor: pointer; transition: var(--transition); }
+        .btn-primary:hover { background: #f3ca40; transform: translateY(-2px); }
+        .btn-secondary { background: transparent; color: #fff; border: 1px solid var(--border); padding: 14px 28px; border-radius: 30px; text-decoration: none; font-weight: 600; transition: var(--transition); }
+        .btn-secondary:hover { border-color: var(--accent-gold); color: var(--accent-gold); }
+
+        .section { padding: 80px 6%; }
+        .section-header { text-align: center; margin-bottom: 50px; }
+        .section-header span { color: var(--accent-gold); font-size: 0.8rem; font-weight: 700; letter-spacing: 2px; }
+        .section-header h2 { font-size: 2.2rem; margin-top: 5px; }
+
+        .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 25px; }
+        .gallery-card { position: relative; border-radius: var(--radius-md); overflow: hidden; height: 380px; border: 1px solid var(--border); }
+        .gallery-card img { width: 100%; height: 100%; object-fit: cover; transition: var(--transition); }
+        .gallery-card:hover img { transform: scale(1.05); }
+        .card-overlay { position: absolute; bottom: 0; left: 0; right: 0; padding: 25px; background: linear-gradient(transparent, rgba(10,10,12,0.95)); }
+        .card-overlay .category { color: var(--accent-gold); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; }
+        .card-overlay h3 { font-size: 1.2rem; margin-top: 4px; }
+
+        /* Modal */
+        .modal-backdrop { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(8px); z-index: 1000; display: none; align-items: center; justify-content: center; padding: 20px; }
+        .modal-backdrop.active { display: flex; }
+        .modal-content { background: var(--bg-card); border: 1px solid var(--border); width: 100%; max-width: 500px; border-radius: var(--radius-md); padding: 35px; position: relative; }
+        .close-btn { position: absolute; top: 20px; right: 20px; background: none; border: none; color: var(--text-muted); font-size: 1.2rem; cursor: pointer; }
+        .close-btn:hover { color: #fff; }
+
+        .form-group { margin-bottom: 18px; }
+        .form-group label { display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 6px; }
+        .form-group input, .form-group select { width: 100%; padding: 12px 16px; background: rgba(255,255,255,0.04); border: 1px solid var(--border); color: #fff; border-radius: 8px; outline: none; transition: var(--transition); }
+        .form-group input:focus, .form-group select:focus { border-color: var(--accent-gold); }
+
+        footer { padding: 40px 6%; text-align: center; border-top: 1px solid var(--border); color: var(--text-muted); font-size: 0.85rem; }
+
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2.2rem; }
+            header { padding: 15px 5%; }
+            nav { display: none; }
+        }
+    </style>
 </head>
 <body>
 
-    <!-- Navigation Header -->
-    <header class="navbar">
-        <a href="#" class="brand-logo">LENS <span>&</span> ART</a>
-        
-        <nav class="nav-links">
+    <header>
+        <a href="#" class="logo">LENS & <span>ART</span></a>
+        <nav>
             <a href="#gallery" id="navGallery">Galerie</a>
             <a href="#about" id="navAbout">À Propos</a>
-            <a href="#contact" id="navContact">Contact</a>
+            <a href="admine.html">Admin</a>
         </nav>
-
         <div class="nav-actions">
-            <button class="lang-switch" id="langToggle" onclick="toggleLanguage()">
+            <button id="langToggle" class="lang-btn" onclick="toggleLanguage()">
                 <i class="fa-solid fa-globe"></i> <span>العربية</span>
             </button>
         </div>
     </header>
 
-    <!-- Hero Section -->
-    <section class="hero-section">
-        <div class="hero-overlay"></div>
-        <div class="hero-content">
-            <span class="hero-tagline" id="heroTagline">STUDIO DE PHOTOGRAPHIE HAUT DE GAMME</span>
-            <h1 id="heroTitle">Saisir Des Moments <br><span class="text-accent">Intemporels</span></h1>
-            <p id="heroDesc">Photographie d'art pour mariages, portraits de prestige et événements. Vos souvenirs immortalisés avec élégance.</p>
-            
-            <div class="hero-actions">
-                <button class="btn btn-gold" onclick="openModal()">
-                    <i class="fa-regular fa-calendar-check"></i> <span id="btnBook">Réserver une séance</span>
-                </button>
-                <a href="tel:+213550000000" class="btn btn-glass">
-                    <i class="fa-solid fa-phone"></i> <span id="btnCall">Appeler maintenant</span>
-                </a>
-            </div>
+    <section class="hero">
+        <span class="tagline" id="heroTagline">STUDIO DE PHOTOGRAPHIE HAUT DE GAMME</span>
+        <h1 id="heroTitle">Saisir Des Moments <br><span class="text-accent">Intemporels</span></h1>
+        <p id="heroDesc">Photographie d'art pour mariages, portraits de prestige et événements. Vos souvenirs immortalisés avec élégance.</p>
+        <div class="btn-group">
+            <button class="btn-primary" onclick="openModal()" id="btnBook">Réserver une séance</button>
+            <a href="tel:+213000000000" class="btn-secondary" id="btnCall">Appeler maintenant</a>
         </div>
     </section>
 
-    <!-- Portfolio Gallery Section -->
-    <section class="gallery-section" id="gallery">
+    <section class="section" id="gallery">
         <div class="section-header">
-            <span class="sub-title" id="gallerySub">PORTFOLIO</span>
+            <span id="gallerySub">PORTFOLIO</span>
             <h2 id="galleryTitle">Travaux Récents</h2>
-            <div class="gold-line"></div>
         </div>
-
         <div class="gallery-grid" id="galleryGrid">
-            <!-- Dynamic items rendered from JS / LocalStorage -->
+            <!-- Dynamic output from script.js -->
         </div>
     </section>
-
-    <!-- About Us Section -->
-    <section class="about-section" id="about">
-        <div class="about-container">
-            <div class="about-image">
-                <img src="https://images.unsplash.com/photo-1554048612-b6a482bc67e5?auto=format&fit=crop&w=800&q=80" alt="Photographer Profile">
-                <div class="experience-badge">
-                    <span class="badge-num">10+</span>
-                    <span class="badge-text" id="badgeYears">Ans d'expérience</span>
-                </div>
-            </div>
-            <div class="about-content">
-                <span class="sub-title" id="aboutSub">À PROPOS DE NOUS</span>
-                <h2 id="aboutTitle">Capturer L'Émotion Avec Passion & Précision</h2>
-                <div class="gold-line left-align"></div>
-                
-                <p id="aboutDesc1">Fondé sur une passion pour l'art visuel et le storytelling, notre studio s'efforce de capturer la véritable essence de vos moments les plus précieux. Nous croyons que chaque photographie doit raconter une histoire intemporelle.</p>
-                <p id="aboutDesc2">Que ce soit pour votre mariage, un portrait professionnel ou un événement d'exception, nous combinons une approche artistique raffinée avec des équipements de pointe pour vous offrir une qualité irréprochable.</p>
-
-                <div class="about-features">
-                    <div class="feature-item">
-                        <i class="fa-solid fa-camera-retro"></i>
-                        <span id="feat1">Matériel Professionnel High-End</span>
-                    </div>
-                    <div class="feature-item">
-                        <i class="fa-solid fa-wand-magic-sparkles"></i>
-                        <span id="feat2">Retouche Artistique Soignée</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer id="contact">
-        <div class="footer-content">
-            <div class="brand-logo">LENS <span>&</span> ART</div>
-            <p id="footerCopy">&copy; 2026 LENS & ART. Tous droits réservés.</p>
-        </div>
-    </footer>
-
-    <!-- Floating Direct Call Button -->
-    <a href="tel:+213550000000" class="floating-call-btn" aria-label="Call Now">
-        <i class="fa-solid fa-phone"></i>
-    </a>
 
     <!-- Booking Modal -->
     <div class="modal-backdrop" id="bookingModal">
-        <div class="modal-card">
-            <button class="modal-close-btn" onclick="closeModal()">&times;</button>
-            <div class="modal-header">
-                <h2 id="modalTitle">Réserver une séance photo</h2>
-                <p id="modalDesc">Complétez le formulaire ci-dessous pour réserver votre date.</p>
-            </div>
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal()"><i class="fa-solid fa-xmark"></i></button>
+            <h2 style="margin-bottom: 5px;" id="modalTitle">Réserver une séance photo</h2>
+            <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 20px;" id="modalDesc">Complétez le formulaire ci-dessous pour réserver votre date.</p>
+            
             <form onsubmit="handleFormSubmit(event)">
                 <div class="form-group">
                     <label id="lblNama">Nom complet</label>
-                    <input type="text" id="inputName" required placeholder="ex: Jean Dupont">
+                    <input type="text" id="inputName" required placeholder="ex: Karim Benali">
                 </div>
                 <div class="form-group">
                     <label id="lblPhone">Numéro de téléphone</label>
-                    <input type="tel" id="inputPhone" required placeholder="0550 00 00 00">
+                    <input type="tel" id="inputPhone" required placeholder="0600000000">
                 </div>
                 <div class="form-group">
                     <label id="lblType">Type de séance</label>
-                    <select id="inputType">
-                        <option id="optWedding" value="Wedding">Photographie de mariage</option>
-                        <option id="optPortrait" value="Portrait">Séance Portrait</option>
-                        <option id="optEvent" value="Event">Couverture d'événement</option>
-                    </select>
+                    <select id="inputType" required></select>
                 </div>
                 <div class="form-group">
-                    <label id="lblDateTime">Date et Heure</label>
+                    <label id="lblDateTime">Date et Heure de la séance</label>
                     <input type="datetime-local" id="inputDateTime" required>
                 </div>
-                <button type="submit" class="btn btn-gold btn-full" id="btnSubmit">
-                    Confirmer la réservation
-                </button>
+                <button type="submit" class="btn-primary" style="width: 100%; margin-top: 10px;" id="btnSubmit">Confirmer la réservation</button>
             </form>
         </div>
     </div>
 
-    <!-- Firebase SDK Setup -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
+    <footer>
+        <p id="footerCopy">© 2026 LENS & ART. Tous droits réservés.</p>
+    </footer>
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyD0uoL6QS40S8Am8WYdLoFfxEsQuhqQPLQ",
-            authDomain: "photoshop-e8266.firebaseapp.com",
-            projectId: "photoshop-e8266",
-            storageBucket: "photoshop-e8266.firebasestorage.app",
-            messagingSenderId: "703007614918",
-            appId: "1:703007614918:web:31241b0b4830ec3681f4c7",
-            measurementId: "G-J1XE0B32HN"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const analytics = getAnalytics(app);
-    </script>
-
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
