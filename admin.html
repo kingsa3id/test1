@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -40,8 +40,8 @@
         .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
         .form-group { margin-bottom: 15px; }
         label { display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 6px; }
-        input, textarea { width: 100%; padding: 12px 16px; background: rgba(255,255,255,0.04); border: 1px solid var(--border); color: #fff; border-radius: 8px; outline: none; transition: var(--transition); }
-        input:focus, textarea:focus { border-color: var(--accent-gold); }
+        input { width: 100%; padding: 12px 16px; background: rgba(255,255,255,0.04); border: 1px solid var(--border); color: #fff; border-radius: 8px; outline: none; transition: var(--transition); }
+        input:focus { border-color: var(--accent-gold); }
 
         .save-btn { background: var(--accent-gold); color: #000; border: none; padding: 12px 24px; border-radius: 30px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: var(--transition); }
         .save-btn:hover { background: #f3ca40; transform: translateY(-2px); }
@@ -64,7 +64,7 @@
 
     <header>
         <h1>LENS & ART <span>Dashboard</span></h1>
-        <a href="index.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i> View Website</a>
+        <a href="index.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Voir le site</a>
     </header>
 
     <div class="tabs">
@@ -76,7 +76,7 @@
     <!-- Panel 1: Session Types Manager -->
     <div class="panel active" id="sessionsPanel">
         <h2 style="margin-bottom: 10px;">Gérer les Types de Séance</h2>
-        <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom: 20px;">Ajoutez, modifiez ou supprimez les types de séance.</p>
+        <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom: 20px;">Ajoutez, modifiez ou supprimez les options du formulaire de réservation.</p>
         
         <form onsubmit="handleSessionSubmit(event)" style="margin-bottom: 30px; background: rgba(255,255,255,0.02); padding: 20px; border-radius: 8px; border: 1px solid var(--border);">
             <input type="hidden" id="sessionId">
@@ -115,7 +115,7 @@
     <!-- Panel 2: Categories Manager -->
     <div class="panel" id="categoriesPanel">
         <h2 style="margin-bottom: 10px;">Gérer les Catégories</h2>
-        <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom: 20px;">Ajoutez, modifiez ou supprimez les catégories de votre portfolio.</p>
+        <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom: 20px;">Ajoutez, modifiez ou supprimez les catégories du portfolio.</p>
         
         <form onsubmit="handleCategorySubmit(event)" style="margin-bottom: 30px; background: rgba(255,255,255,0.02); padding: 20px; border-radius: 8px; border: 1px solid var(--border);">
             <input type="hidden" id="categoryId">
@@ -220,7 +220,7 @@
                 tbody.appendChild(tr);
             });
         }, (error) => {
-            alert("Erreur Firebase (Session Types): " + error.message);
+            alert("Erreur Firebase: " + error.message);
         });
 
         async function handleSessionSubmit(e) {
@@ -235,11 +235,11 @@
                     alert("Type de séance mis à jour.");
                 } else {
                     await db.collection("session_types").add({ fr, ar });
-                    alert("Nouveau type de séance ajouté.");
+                    alert("Type de séance ajouté.");
                 }
                 resetSessionForm();
             } catch (error) {
-                alert("Erreur lors de l'enregistrement: " + error.message);
+                alert("Erreur: " + error.message);
             }
         }
 
@@ -264,7 +264,7 @@
                 try {
                     await db.collection("session_types").doc(id).delete();
                 } catch (error) {
-                    alert("Erreur lors de la suppression: " + error.message);
+                    alert("Erreur: " + error.message);
                 }
             }
         }
@@ -297,7 +297,7 @@
                 tbody.appendChild(tr);
             });
         }, (error) => {
-            alert("Erreur Firebase (Categories): " + error.message);
+            alert("Erreur Firebase: " + error.message);
         });
 
         async function handleCategorySubmit(e) {
@@ -309,14 +309,14 @@
             try {
                 if (id) {
                     await db.collection("categories").doc(id).update({ fr, ar });
-                    alert("Catégorie mise à jour avec succès.");
+                    alert("Catégorie mise à jour.");
                 } else {
                     await db.collection("categories").add({ fr, ar });
-                    alert("Nouvelle catégorie ajoutée avec succès.");
+                    alert("Catégorie ajoutée.");
                 }
                 resetCategoryForm();
             } catch (error) {
-                alert("Erreur lors de l'enregistrement de la catégorie: " + error.message);
+                alert("Erreur: " + error.message);
             }
         }
 
@@ -341,7 +341,7 @@
                 try {
                     await db.collection("categories").doc(id).delete();
                 } catch (error) {
-                    alert("Erreur lors de la suppression de la catégorie: " + error.message);
+                    alert("Erreur: " + error.message);
                 }
             }
         }
