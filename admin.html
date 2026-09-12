@@ -75,7 +75,7 @@
     <!-- Panel 1: Site Text Editor -->
     <div class="panel active" id="textPanel">
         <h2 style="margin-bottom: 20px;">Edit Main Titles & Descriptions</h2>
-        <p style="color:var(--text-muted); margin-bottom:20px; font-size:0.9rem;">Changes are saved locally first. You will need to click 'Publish' to make them live on the main site (requires additional Firebase configuration for 'Publishing').</p>
+        <p style="color:var(--text-muted); margin-bottom:20px; font-size:0.9rem;">Changes are saved locally first. You will need to click 'Publish' to make them live on the main site.</p>
         <form onsubmit="saveTranslationsLocal(event)">
             <div class="form-grid">
                 <div>
@@ -144,7 +144,7 @@
         <table>
             <thead>
                 <tr>
-                    <th>Date / Time</th>
+                    <th>Booked Appointment Date</th>
                     <th>Full Name</th>
                     <th>Phone</th>
                     <th>Session Type</th>
@@ -197,12 +197,10 @@
         }
 
         // --- Admin Edits: Photo Upload to Firebase Storage ---
-        // (Ensure you have initialized your Firebase config if you want to use this part)
         const uploadBtn = document.getElementById('uploadBtn');
 
         function handleGalleryUpload(e) {
             e.preventDefault();
-            // Checking if firebase is fully configured for storage
             if (typeof firebase === 'undefined' || !firebase.storage) {
                 alert("Firebase is not fully configured for this project yet.");
                 return;
@@ -265,11 +263,14 @@
             
             // Reverse the array so the newest bookings show up at the top
             bookings.reverse().forEach(b => {
+                // Show the date they booked for. Replace 'T' with a space to make it look nicer.
+                const displayDate = b.bookedDateTime ? b.bookedDateTime.replace('T', ' à ') : (b.date || "N/A");
+                
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td>${b.date || "N/A"}</td>
+                    <td style="color: var(--accent-gold); font-weight: 600;">${displayDate}</td>
                     <td style="font-weight: 600;">${b.name || "N/A"}</td>
-                    <td style="color: var(--accent-gold);">${b.phone || "N/A"}</td>
+                    <td>${b.phone || "N/A"}</td>
                     <td>${b.type || "N/A"}</td>
                 `;
                 tbody.appendChild(tr);
