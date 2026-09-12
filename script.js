@@ -1,4 +1,4 @@
-// Firebase Initialization
+// Firebase Config
 const firebaseConfig = {
     apiKey: "AIzaSyD0uoL6QS40S8Am8WYdLoFfxEsQuhqQPLQ",
     authDomain: "photoshop-e8266.firebaseapp.com",
@@ -12,7 +12,7 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-// Translations Database
+// Language & Site Translations
 const defaultTranslations = {
     fr: {
         langBtn: "العربية",
@@ -74,22 +74,16 @@ const defaultTranslations = {
     }
 };
 
-const defaultGallery = [
-    { img: "https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=80", catFr: "Mariage", catAr: "أعراس", title: "Elegance in White" },
-    { img: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=800&q=80", catFr: "Portrait", catAr: "بورتوريه", title: "Studio Series" },
-    { img: "https://images.unsplash.com/photo-1469371670807-013ccf25f16a?auto=format&fit=crop&w=800&q=80", catFr: "Événement", catAr: "مناسبات", title: "Gala Evening" }
-];
-
 let translations = JSON.parse(localStorage.getItem('site_translations')) || defaultTranslations;
-let galleryItems = JSON.parse(localStorage.getItem('site_gallery')) || defaultGallery;
 let currentLang = 'fr';
 let cachedSessionTypes = [];
+let cachedCategories = [];
 
 // Initialize Page
 document.addEventListener("DOMContentLoaded", () => {
-    renderGallery();
     applyLanguage(currentLang);
     listenToSessionTypes();
+    listenToCategories();
 });
 
 // Dynamic Language Switching
@@ -126,8 +120,8 @@ function applyLanguage(lang) {
     if (document.getElementById('lblDateTime')) document.getElementById('lblDateTime').innerText = data.lblDateTime;
     if (document.getElementById('btnSubmit')) document.getElementById('btnSubmit').innerText = data.btnSubmit;
 
-    renderGallery();
     renderSessionOptions();
+    renderGallery();
 }
 
 function toggleLanguage() {
@@ -135,33 +129,23 @@ function toggleLanguage() {
     applyLanguage(currentLang);
 }
 
-// Portfolio Grid Renderer
-function renderGallery() {
-    const grid = document.getElementById('galleryGrid');
-    if (!grid) return;
-    grid.innerHTML = '';
-
-    galleryItems.forEach(item => {
-        const cat = currentLang === 'ar' ? item.catAr : item.catFr;
-        grid.innerHTML += `
-            <div class="gallery-card">
-                <img src="${item.img}" alt="${item.title}">
-                <div class="card-overlay">
-                    <span class="category">${cat}</span>
-                    <h3>${item.title}</h3>
-                </div>
-            </div>
-        `;
-    });
+// Modal Controls
+function openModal() {
+    const modal = document.getElementById('bookingModal');
+    if (modal) modal.classList.add('active');
 }
 
-// Modal Control
-const modal = document.getElementById('bookingModal');
-function openModal() { if (modal) modal.classList.add('active'); }
-function closeModal() { if (modal) modal.classList.remove('active'); }
-window.onclick = function(event) { if (event.target === modal) closeModal(); };
+function closeModal() {
+    const modal = document.getElementById('bookingModal');
+    if (modal) modal.classList.remove('active');
+}
 
-// Real-Time Session Types Firestore Listener
+window.onclick = function(event) {
+    const modal = document.getElementById('bookingModal');
+    if (event.target === modal) closeModal();
+};
+
+// Real-Time Session Types Listener
 function listenToSessionTypes() {
     db.collection("session_types").onSnapshot((snapshot) => {
         cachedSessionTypes = [];
@@ -169,6 +153,8 @@ function listenToSessionTypes() {
             cachedSessionTypes.push(doc.data());
         });
         renderSessionOptions();
+    }, (error) => {
+        console.error("Session types sync error:", error);
     });
 }
 
@@ -183,7 +169,7 @@ function renderSessionOptions() {
         select.innerHTML = `
             <option value="Photographie de mariage">${currentLang === 'ar' ? 'تصوير أعراس' : 'Photographie de mariage'}</option>
             <option value="Séance Portrait">${currentLang === 'ar' ? 'جلسة بورتوريه' : 'Séance Portrait'}</option>
-            <option value="Couverture d\'événement">${currentLang === 'ar' ? 'تغطية مناسبات' : 'Couverture d\'événement'}</option>
+            <option value="Couverture d'événement">${currentLang === 'ar' ? 'تغطية مناسبات' : 'Couverture d\'événement'}</option>
         `;
         return;
     }
@@ -198,14 +184,61 @@ function renderSessionOptions() {
     if (currentSelection) select.value = currentSelection;
 }
 
-// Async Form Submission directly synced with Firebase Cloud Database
+// Real-Time Categories Listener
+function listenToCategories() {
+    db.collection("categories").onSnapshot((snapshot) => {
+        cachedCategories = [];
+        snapshot.forEach((doc) => {
+            cachedCategories.push(doc.data());
+        });
+        renderGallery();
+    }, (error) => {
+        console.error("Categories sync error:", error);
+    });
+}
+
+// Gallery & Categories Renderer
+function renderGallery() {
+    const grid = document.getElementById('galleryGrid');
+    if (!grid) return;
+    grid.innerHTML = '';
+
+    const displayList = cachedCategories.length > 0 
+        ? cachedCategories.map(c => ({
+            img: "https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=80",
+            catFr: c.fr,
+            catAr: c.ar,
+            title: c.fr
+        }))
+        : [
+            { img: "https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=80", catFr: "Mariage", catAr: "أعراس", title: "Elegance in White" },
+            { img: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=800&q=80", catFr: "Portrait", catAr: "بورتوريه", title: "Studio Series" },
+            { img: "https://images.unsplash.com/photo-1469371670807-013ccf25f16a?auto=format&fit=crop&w=800&q=80", catFr: "Événement", catAr: "مناسبات", title: "Gala Evening" }
+        ];
+
+    displayList.forEach(item => {
+        const cat = currentLang === 'ar' ? item.catAr : item.catFr;
+        grid.innerHTML += `
+            <div class="gallery-card">
+                <img src="${item.img}" alt="${item.title}">
+                <div class="card-overlay">
+                    <span class="category">${cat}</span>
+                    <h3>${item.title}</h3>
+                </div>
+            </div>
+        `;
+    });
+}
+
+// Booking Form Submission
 async function handleFormSubmit(event) {
     event.preventDefault();
     
     const submitBtn = document.getElementById('btnSubmit');
     const nameInput = document.getElementById('inputName').value.trim();
     const phoneInput = document.getElementById('inputPhone').value.trim();
-    const typeInput = document.getElementById('inputType').value;
+    const typeSelect = document.getElementById('inputType');
+    const typeInput = typeSelect ? typeSelect.value : "";
     const dateTimeInput = document.getElementById('inputDateTime').value;
 
     if (nameInput.length < 3) {
@@ -223,7 +256,6 @@ async function handleFormSubmit(event) {
     submitBtn.innerText = currentLang === 'fr' ? "Vérification..." : "جاري التحقق...";
 
     try {
-        // Query Firestore to verify date/time slot availability
         const snapshot = await db.collection("bookings")
             .where("bookedDateTime", "==", dateTimeInput)
             .get();
@@ -237,7 +269,6 @@ async function handleFormSubmit(event) {
             return;
         }
 
-        // Write booking to Cloud Firestore
         await db.collection("bookings").add({
             name: nameInput,
             phone: phoneInput,
