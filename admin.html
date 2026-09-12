@@ -10,6 +10,7 @@
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
     
     <style>
         :root {
@@ -40,8 +41,8 @@
         .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
         .form-group { margin-bottom: 15px; }
         label { display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 6px; }
-        input, select { width: 100%; padding: 12px 16px; background: rgba(255,255,255,0.04); border: 1px solid var(--border); color: #fff; border-radius: 8px; outline: none; transition: var(--transition); }
-        input:focus { border-color: var(--accent-gold); }
+        input, textarea, select { width: 100%; padding: 12px 16px; background: rgba(255,255,255,0.04); border: 1px solid var(--border); color: #fff; border-radius: 8px; outline: none; transition: var(--transition); }
+        input:focus, textarea:focus { border-color: var(--accent-gold); }
 
         .save-btn { background: var(--accent-gold); color: #000; border: none; padding: 12px 24px; border-radius: 30px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: var(--transition); }
         .save-btn:hover { background: #f3ca40; transform: translateY(-2px); }
@@ -68,65 +69,129 @@
     </header>
 
     <div class="tabs">
-        <button class="tab-btn active" onclick="switchTab('bookingsPanel', this)">Bookings</button>
-        <button class="tab-btn" onclick="switchTab('sessionsPanel', this)">Session Types</button>
+        <button class="tab-btn active" onclick="switchTab('sessionsPanel', this)">Types de Séance</button>
+        <button class="tab-btn" onclick="switchTab('bookingsPanel', this)">Bookings</button>
+        <button class="tab-btn" onclick="switchTab('textPanel', this)">Edit Texts</button>
+        <button class="tab-btn" onclick="switchTab('galleryPanel', this)">Upload Photos</button>
     </div>
 
-    <!-- Panel 1: Client Bookings List -->
-    <div class="panel active" id="bookingsPanel">
-        <h2 style="margin-bottom: 10px;">Client Bookings (Live Cloud Sync)</h2>
-        <p style="color:var(--text-muted); font-size:0.9rem;">Deleting a booking instantly frees up that time slot for other customers.</p>
-        <table>
-            <thead>
-                <tr>
-                    <th>Booked Appointment</th>
-                    <th>Full Name</th>
-                    <th>Phone</th>
-                    <th>Session Type</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody id="bookingsTable">
-                <tr><td colspan="5" style="text-align:center;">Loading bookings...</td></tr>
-            </tbody>
-        </table>
-    </div>
-
-    <!-- Panel 2: Session Types Manager -->
-    <div class="panel" id="sessionsPanel">
-        <h2 style="margin-bottom: 20px;">Manage Session Types</h2>
-        <form onsubmit="handleSessionSubmit(event)" style="margin-bottom: 30px;">
+    <!-- Panel 1: Session Types Manager (Add / Edit / Delete) -->
+    <div class="panel active" id="sessionsPanel">
+        <h2 style="margin-bottom: 10px;">Gérer les Types de Séance</h2>
+        <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom: 20px;">Ajoutez, modifiez ou supprimez les options affichées dans le formulaire de réservation.</p>
+        
+        <form onsubmit="handleSessionSubmit(event)" style="margin-bottom: 30px; background: rgba(255,255,255,0.02); padding: 20px; border-radius: 8px; border: 1px solid var(--border);">
             <input type="hidden" id="sessionId">
             <div class="form-grid">
                 <div class="form-group">
-                    <label>Title in French (FR)</label>
-                    <input type="text" id="sessionFr" required placeholder="e.g. Séance Portrait">
+                    <label>Nom en Français (FR)</label>
+                    <input type="text" id="sessionFr" required placeholder="ex: Séance Portrait Pro">
                 </div>
                 <div class="form-group">
-                    <label>Title in Arabic (AR)</label>
-                    <input type="text" id="sessionAr" dir="rtl" required placeholder="مثال: جلسة بورتوريه">
+                    <label>Nom en Arabe (AR)</label>
+                    <input type="text" id="sessionAr" dir="rtl" required placeholder="مثال: جلسة بورتوريه احترافية">
                 </div>
             </div>
             <button type="submit" class="save-btn" id="sessionFormBtn">
-                <i class="fa-solid fa-plus"></i> Add Session Type
+                <i class="fa-solid fa-plus"></i> Ajouter Type de Séance
             </button>
             <button type="button" class="btn-delete" id="cancelEditBtn" style="display:none; margin-left:10px;" onclick="resetSessionForm()">
-                Cancel Edit
+                Annuler
             </button>
         </form>
 
         <table>
             <thead>
                 <tr>
-                    <th>French (FR)</th>
-                    <th>Arabic (AR)</th>
+                    <th>Français (FR)</th>
+                    <th>Arabe (AR)</th>
                     <th>Actions</th>
                 </tr>
             </thead>
             <tbody id="sessionsTable">
-                <tr><td colspan="3" style="text-align:center;">Loading session types...</td></tr>
+                <tr><td colspan="3" style="text-align:center;">Chargement des types de séance...</td></tr>
             </tbody>
         </table>
+    </div>
+
+    <!-- Panel 2: Client Bookings List (Delete Enabled) -->
+    <div class="panel" id="bookingsPanel">
+        <h2 style="margin-bottom: 10px;">Réservations Clients</h2>
+        <p style="color:var(--text-muted); font-size:0.9rem;">La suppression d'une réservation libère immédiatement le créneau sur le site.</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Date & Heure</th>
+                    <th>Nom Complet</th>
+                    <th>Téléphone</th>
+                    <th>Type de Séance</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="bookingsTable">
+                <tr><td colspan="5" style="text-align:center;">Chargement des réservations...</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Panel 3: Site Text Editor -->
+    <div class="panel" id="textPanel">
+        <h2 style="margin-bottom: 20px;">Edit Main Titles & Descriptions</h2>
+        <form onsubmit="saveTranslationsLocal(event)">
+            <div class="form-grid">
+                <div>
+                    <h3 style="color:var(--accent-gold); margin-bottom:15px;">French (FR)</h3>
+                    <div class="form-group">
+                        <label>Hero Title</label>
+                        <input type="text" id="fr_heroTitle">
+                    </div>
+                    <div class="form-group">
+                        <label>Hero Description</label>
+                        <textarea id="fr_heroDesc" rows="3"></textarea>
+                    </div>
+                </div>
+                <div>
+                    <h3 style="color:var(--accent-gold); margin-bottom:15px;">Arabic (AR)</h3>
+                    <div class="form-group">
+                        <label>Hero Title</label>
+                        <input type="text" id="ar_heroTitle" dir="rtl">
+                    </div>
+                    <div class="form-group">
+                        <label>Hero Description</label>
+                        <textarea id="ar_heroDesc" rows="3" dir="rtl"></textarea>
+                    </div>
+                </div>
+            </div>
+            <button type="submit" class="save-btn">Save Content Locally</button>
+        </form>
+    </div>
+
+    <!-- Panel 4: Portfolio Photo Uploader -->
+    <div class="panel" id="galleryPanel">
+        <h2 style="margin-bottom: 20px;">Upload Image to Cloud</h2>
+        <form onsubmit="handleGalleryUpload(event)">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Select Photo</label>
+                    <input type="file" id="device_img_file" accept="image/*" required>
+                </div>
+                <div class="form-group">
+                    <label>Title</label>
+                    <input type="text" id="new_title" required placeholder="Project Title">
+                </div>
+                <div class="form-group">
+                    <label>Category (FR)</label>
+                    <input type="text" id="new_catFr" placeholder="Mariage">
+                </div>
+                <div class="form-group">
+                    <label>Category (AR)</label>
+                    <input type="text" id="new_catAr" dir="rtl" placeholder="أعراس">
+                </div>
+            </div>
+            <button type="submit" class="save-btn" id="uploadBtn">
+                <i class="fa-solid fa-cloud-arrow-up"></i> Upload Image
+            </button>
+        </form>
     </div>
 
     <script>
@@ -151,54 +216,12 @@
             btn.classList.add('active');
         }
 
-        // --- 1. Real-time Bookings Manager ---
-        db.collection("bookings").onSnapshot((snapshot) => {
-            const tbody = document.getElementById('bookingsTable');
-            tbody.innerHTML = '';
-
-            if (snapshot.empty) {
-                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 30px; color: var(--text-muted);">No active bookings found.</td></tr>';
-                return;
-            }
-
-            snapshot.forEach((doc) => {
-                const b = doc.data();
-                const displayDate = b.bookedDateTime ? b.bookedDateTime.replace('T', ' à ') : "N/A";
-                
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td style="color: var(--accent-gold); font-weight: 600;">${displayDate}</td>
-                    <td style="font-weight: 600;">${b.name || "N/A"}</td>
-                    <td>${b.phone || "N/A"}</td>
-                    <td>${b.type || "N/A"}</td>
-                    <td>
-                        <button class="btn-delete" onclick="deleteBooking('${doc.id}')">
-                            <i class="fa-solid fa-trash"></i> Delete
-                        </button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
-        });
-
-        async function deleteBooking(id) {
-            if (confirm("Are you sure you want to delete this booking? This will reopen the time slot on the website.")) {
-                try {
-                    await db.collection("bookings").doc(id).delete();
-                    alert("Booking deleted successfully.");
-                } catch (error) {
-                    alert("Error deleting booking: " + error.message);
-                }
-            }
-        }
-
-        // --- 2. Real-time Session Types Manager ---
+        // --- 1. Session Types Manager (Firestore CRUD) ---
         db.collection("session_types").onSnapshot((snapshot) => {
             const tbody = document.getElementById('sessionsTable');
             tbody.innerHTML = '';
 
             if (snapshot.empty) {
-                // Initialize defaults if empty
                 seedDefaultSessions();
                 return;
             }
@@ -210,11 +233,11 @@
                     <td style="font-weight: 600;">${s.fr}</td>
                     <td dir="rtl" style="font-weight: 600;">${s.ar}</td>
                     <td>
-                        <button class="btn-edit" onclick="editSession('${doc.id}', '${s.fr}', '${s.ar}')">
-                            <i class="fa-solid fa-pen"></i> Edit
+                        <button class="btn-edit" onclick="editSession('${doc.id}', \`${s.fr}\`, \`${s.ar}\`)">
+                            <i class="fa-solid fa-pen"></i> Modifier
                         </button>
                         <button class="btn-delete" onclick="deleteSession('${doc.id}')">
-                            <i class="fa-solid fa-trash"></i> Delete
+                            <i class="fa-solid fa-trash"></i> Supprimer
                         </button>
                     </td>
                 `;
@@ -240,13 +263,11 @@
             const ar = document.getElementById('sessionAr').value.trim();
 
             if (id) {
-                // Update existing
                 await db.collection("session_types").doc(id).update({ fr, ar });
-                alert("Session type updated successfully.");
+                alert("Type de séance mis à jour avec succès.");
             } else {
-                // Create new
                 await db.collection("session_types").add({ fr, ar });
-                alert("New session type added.");
+                alert("Nouveau type de séance ajouté.");
             }
 
             resetSessionForm();
@@ -256,7 +277,7 @@
             document.getElementById('sessionId').value = id;
             document.getElementById('sessionFr').value = fr;
             document.getElementById('sessionAr').value = ar;
-            document.getElementById('sessionFormBtn').innerHTML = '<i class="fa-solid fa-check"></i> Update Session Type';
+            document.getElementById('sessionFormBtn').innerHTML = '<i class="fa-solid fa-check"></i> Enregistrer les modifications';
             document.getElementById('cancelEditBtn').style.display = 'inline-block';
         }
 
@@ -264,13 +285,54 @@
             document.getElementById('sessionId').value = '';
             document.getElementById('sessionFr').value = '';
             document.getElementById('sessionAr').value = '';
-            document.getElementById('sessionFormBtn').innerHTML = '<i class="fa-solid fa-plus"></i> Add Session Type';
+            document.getElementById('sessionFormBtn').innerHTML = '<i class="fa-solid fa-plus"></i> Ajouter Type de Séance';
             document.getElementById('cancelEditBtn').style.display = 'none';
         }
 
         async function deleteSession(id) {
-            if (confirm("Are you sure you want to delete this session type?")) {
+            if (confirm("Voulez-vous vraiment supprimer ce type de séance ?")) {
                 await db.collection("session_types").doc(id).delete();
+            }
+        }
+
+        // --- 2. Real-time Bookings Manager ---
+        db.collection("bookings").onSnapshot((snapshot) => {
+            const tbody = document.getElementById('bookingsTable');
+            tbody.innerHTML = '';
+
+            if (snapshot.empty) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 30px; color: var(--text-muted);">Aucune réservation trouvée.</td></tr>';
+                return;
+            }
+
+            snapshot.forEach((doc) => {
+                const b = doc.data();
+                const displayDate = b.bookedDateTime ? b.bookedDateTime.replace('T', ' à ') : "N/A";
+                
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td style="color: var(--accent-gold); font-weight: 600;">${displayDate}</td>
+                    <td style="font-weight: 600;">${b.name || "N/A"}</td>
+                    <td>${b.phone || "N/A"}</td>
+                    <td>${b.type || "N/A"}</td>
+                    <td>
+                        <button class="btn-delete" onclick="deleteBooking('${doc.id}')">
+                            <i class="fa-solid fa-trash"></i> Supprimer
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        });
+
+        async function deleteBooking(id) {
+            if (confirm("Êtes-vous sûr de vouloir supprimer cette réservation ?")) {
+                try {
+                    await db.collection("bookings").doc(id).delete();
+                    alert("Réservation supprimée avec succès.");
+                } catch (error) {
+                    alert("Erreur lors de la suppression : " + error.message);
+                }
             }
         }
     </script>
