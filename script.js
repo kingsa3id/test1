@@ -1,5 +1,4 @@
 // Firebase Configuration & Initialization
-// Replace with your actual Firebase config if using database functionality
 const firebaseConfig = {
     apiKey: "YOUR_API_KEY",
     authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
@@ -9,14 +8,16 @@ const firebaseConfig = {
     appId: "YOUR_APP_ID"
 };
 
-// Initialize Firebase if SDK is present
 if (typeof firebase !== 'undefined' && firebase.apps.length === 0) {
     firebase.initializeApp(firebaseConfig);
 }
 
 const db = (typeof firebase !== 'undefined' && firebase.firestore) ? firebase.firestore() : null;
 
-// Multi-Language System
+// Global state for dynamic session types
+let dynamicSessionTypes = [];
+
+// Translations
 const translations = {
     fr: {
         navGallery: "Galerie",
@@ -42,7 +43,7 @@ const translations = {
         lblType: "Type de séance",
         lblDateTime: "Date et Heure de la séance",
         btnSubmit: "Confirmer la réservation",
-        types: ["Mariage", "Portrait", "Événement", "Autre"]
+        fallbackTypes: ["Mariage", "Portrait", "Événement", "Autre"]
     },
     ar: {
         navGallery: "المعرض",
@@ -68,13 +69,12 @@ const translations = {
         lblType: "نوع الجلسة",
         lblDateTime: "تاريخ ووقت الجلسة",
         btnSubmit: "تأكيد الحجز",
-        types: ["زفاف", "بورتريه", "مناسبة", "آخر"]
+        fallbackTypes: ["زفاف", "بورتريه", "مناسبة", "آخر"]
     }
 };
 
 let currentLang = 'fr';
 
-// Language Toggle Handler
 function toggleLanguage() {
     currentLang = currentLang === 'fr' ? 'ar' : 'fr';
     document.documentElement.setAttribute('dir', currentLang === 'ar' ? 'rtl' : 'ltr');
@@ -106,22 +106,62 @@ function toggleLanguage() {
     document.getElementById('lblDateTime').innerText = t.lblDateTime;
     document.getElementById('btnSubmit').innerText = t.btnSubmit;
 
-    populateSelectTypes();
+    renderSelectTypes();
 }
 
-function populateSelectTypes() {
-    const select = document.getElementById('inputType');
-    if (!select) return;
-    select.innerHTML = '';
-    translations[currentLang].types.forEach(type => {
-        const option = document.createElement('option');
-        option.value = type;
-        option.textContent = type;
-        select.appendChild(option);
+// Fetch dynamic types from Firestore
+function loadSessionTypes() {
+    if (!db) {
+        renderSelectTypes();
+        return;
+    }
+
+    // Listens to Firestore changes in real-time
+    db.collection('session_types').onSnapshot(snapshot => {
+        if (!snapshot.empty) {
+            dynamicSessionTypes = [];
+            snapshot.docs.forEach(doc => {
+                const data = doc.data();
+                dynamicSessionTypes.push({
+                    fr: data.fr || data.nameFr || data.french || '',
+                    ar: data.ar || data.nameAr || data.arabic || ''
+                });
+            });
+        }
+        renderSelectTypes();
+    }, error => {
+        console.warn("Could not load dynamic session types from Firestore, using default options.", error);
+        renderSelectTypes();
     });
 }
 
-// Modal Toggle Functions
+// Populate the select dropdown with dynamic or fallback options
+function renderSelectTypes() {
+    const select = document.getElementById('inputType');
+    if (!select) return;
+    select.innerHTML = '';
+
+    if (dynamicSessionTypes.length > 0) {
+        dynamicSessionTypes.forEach(item => {
+            const label = currentLang === 'ar' ? (item.ar || item.fr) : (item.fr || item.ar);
+            if (label) {
+                const option = document.createElement('option');
+                option.value = label;
+                option.textContent = label;
+                select.appendChild(option);
+            }
+        });
+    } else {
+        // Fallback default options
+        translations[currentLang].fallbackTypes.forEach(type => {
+            const option = document.createElement('option');
+            option.value = type;
+            option.textContent = type;
+            select.appendChild(option);
+        });
+    }
+}
+
 function openModal() {
     document.getElementById('bookingModal').classList.add('active');
 }
@@ -130,7 +170,6 @@ function closeModal() {
     document.getElementById('bookingModal').classList.remove('active');
 }
 
-// Booking Form Submit Handler
 function handleFormSubmit(e) {
     e.preventDefault();
     const name = document.getElementById('inputName').value;
@@ -150,7 +189,7 @@ function handleFormSubmit(e) {
             closeModal();
             e.target.reset();
         }).catch(err => {
-            console.error("Booking submission error:", err);
+            console.error("Booking error:", err);
             alert(currentLang === 'fr' ? 'Réservation envoyée avec succès!' : 'تم إرسال طلب الحجز بنجاح!');
             closeModal();
         });
@@ -160,37 +199,31 @@ function handleFormSubmit(e) {
     }
 }
 
-// Load Gallery Data Safely
 function loadGallery() {
     const galleryGrid = document.getElementById('galleryGrid');
-    if (!galleryGrid) return;
+    if (!galleryGrid || !db) return;
 
-    if (db) {
-        db.collection('gallery').onSnapshot(snapshot => {
-            if (snapshot.empty) return; // Keep fallback HTML if database is empty
+    db.collection('gallery').onSnapshot(snapshot => {
+        if (snapshot.empty) return;
 
-            galleryGrid.innerHTML = '';
-            snapshot.docs.forEach(doc => {
-                const item = doc.data();
-                const card = document.createElement('div');
-                card.className = 'gallery-card';
-                card.innerHTML = `
-                    <img src="${item.imageUrl || item.url || ''}" alt="${item.title || 'Photo'}">
-                    <div class="card-overlay">
-                        <span class="category">${(item.category || 'MARIAGE').toUpperCase()}</span>
-                        <h3>${item.title || 'Studio Series'}</h3>
-                    </div>
-                `;
-                galleryGrid.appendChild(card);
-            });
-        }, error => {
-            console.log("Firebase Gallery Load Notice: Using static layout.", error);
+        galleryGrid.innerHTML = '';
+        snapshot.docs.forEach(doc => {
+            const item = doc.data();
+            const card = document.createElement('div');
+            card.className = 'gallery-card';
+            card.innerHTML = `
+                <img src="${item.imageUrl || item.url || ''}" alt="${item.title || 'Photo'}">
+                <div class="card-overlay">
+                    <span class="category">${(item.category || 'MARIAGE').toUpperCase()}</span>
+                    <h3>${item.title || 'Studio Series'}</h3>
+                </div>
+            `;
+            galleryGrid.appendChild(card);
         });
-    }
+    });
 }
 
-// Initialize on DOM Ready
 document.addEventListener('DOMContentLoaded', () => {
-    populateSelectTypes();
+    loadSessionTypes();
     loadGallery();
 });
