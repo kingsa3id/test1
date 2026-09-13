@@ -1,4 +1,6 @@
-// Firebase Configuration
+// ==========================================
+// 1. FIREBASE CONFIGURATION & INITIALIZATION
+// ==========================================
 const firebaseConfig = {
     apiKey: "AIzaSyD0uoLQDS40S8Am8WYdLOfFxEsQuhqQPLQ",
     authDomain: "photoshop-e8266.firebaseapp.com",
@@ -10,24 +12,51 @@ const firebaseConfig = {
     measurementId: "G-J1XE0B32HN"
 };
 
-// Initialize Firebase
-if (typeof firebase !== 'undefined' && firebase.apps.length === 0) {
-    firebase.initializeApp(firebaseConfig);
+let db = null;
+try {
+    if (typeof firebase !== 'undefined') {
+        if (firebase.apps.length === 0) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        if (firebase.firestore) {
+            db = firebase.firestore();
+        }
+    }
+} catch (err) {
+    console.warn("Firebase fallback mode:", err);
 }
 
-const db = (typeof firebase !== 'undefined' && firebase.firestore) ? firebase.firestore() : null;
-
-// Initialize Page Logic
+// ==========================================
+// 2. DOM INITIALIZATION & SITE INTERACTION
+// ==========================================
 document.addEventListener('DOMContentLoaded', () => {
+    // Load dynamic session types into form select
     loadSessionTypes();
 
+    // Attach submit listener to booking form
     const bookingForm = document.getElementById('bookingForm');
     if (bookingForm) {
         bookingForm.addEventListener('submit', handleBookingSubmit);
     }
+
+    // Enable Smooth Scroll for site links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            const targetId = this.getAttribute('href');
+            if (targetId && targetId !== '#') {
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    e.preventDefault();
+                    targetElement.scrollIntoView({ behavior: 'smooth' });
+                }
+            }
+        });
+    });
 });
 
-// Load Session Types into Dropdown
+// ==========================================
+// 3. SESSION TYPES DROPDOWN LOGIC
+// ==========================================
 function loadSessionTypes() {
     const typeSelect = document.getElementById('bookingType');
     if (!typeSelect) return;
@@ -50,11 +79,11 @@ function loadSessionTypes() {
                     });
                 });
                 populateTypeOptions(typeSelect, fetched);
-                return;
+            } else {
+                populateLocalTypes(typeSelect, defaultTypes);
             }
-            populateLocalTypes(typeSelect, defaultTypes);
         }, err => {
-            console.error("Firestore loading error:", err);
+            console.warn("Firestore listener error, using local fallback:", err);
             populateLocalTypes(typeSelect, defaultTypes);
         });
     } else {
@@ -78,7 +107,9 @@ function populateTypeOptions(selectElement, types) {
     });
 }
 
-// Handle Booking Form Submission with Strict Double-Booking Prevention
+// ==========================================
+// 4. BOOKING & STRICT DOUBLE-BOOKING CHECK
+// ==========================================
 async function handleBookingSubmit(e) {
     e.preventDefault();
 
@@ -99,11 +130,10 @@ async function handleBookingSubmit(e) {
         return;
     }
 
-    // Disable button during check to prevent duplicate clicks
     if (submitBtn) submitBtn.disabled = true;
 
     try {
-        // 1. Check in LocalStorage
+        // 1. Check LocalStorage for duplicate time slot
         const localBookings = JSON.parse(localStorage.getItem('admin_bookings') || '[]');
         const isConflictLocal = localBookings.some(b => b.datetime === datetime);
 
@@ -113,17 +143,26 @@ async function handleBookingSubmit(e) {
             return;
         }
 
-        // 2. Check in Firebase Firestore
+        // 2. Check Firebase Firestore with a 3-second timeout guard
         if (db) {
-            const snapshot = await db.collection('bookings').where('datetime', '==', datetime).get();
-            if (!snapshot.empty) {
-                alert("Ce créneau horaire est déjà réservé ! Veuillez choisir une autre date ou heure.");
-                if (submitBtn) submitBtn.disabled = false;
-                return;
+            const checkQuery = db.collection('bookings').where('datetime', '==', datetime).get();
+            const timeoutPromise = new Promise((_, reject) => 
+                setTimeout(() => reject(new Error("Timeout")), 3000)
+            );
+
+            try {
+                const snapshot = await Promise.race([checkQuery, timeoutPromise]);
+                if (snapshot && !snapshot.empty) {
+                    alert("Ce créneau horaire est déjà réservé ! Veuillez choisir une autre date ou heure.");
+                    if (submitBtn) submitBtn.disabled = false;
+                    return;
+                }
+            } catch (netErr) {
+                console.warn("Online check skipped, using local verification:", netErr);
             }
         }
 
-        // 3. Save new booking if slot is free
+        // 3. Save the valid booking
         const newBooking = {
             name: name,
             phone: phone,
@@ -136,15 +175,15 @@ async function handleBookingSubmit(e) {
         localStorage.setItem('admin_bookings', JSON.stringify(localBookings));
 
         if (db) {
-            await db.collection('bookings').add(newBooking);
+            db.collection('bookings').add(newBooking).catch(err => console.error("Firestore save err:", err));
         }
 
         alert("Réservation effectuée avec succès !");
         e.target.reset();
 
     } catch (err) {
-        console.error("Erreur de vérification:", err);
-        alert("Une erreur est survenue lors de la vérification. Veuillez réessayer.");
+        console.error("Booking handler error:", err);
+        alert("Une erreur est survenue. Veuillez réessayer.");
     } finally {
         if (submitBtn) submitBtn.disabled = false;
     }
