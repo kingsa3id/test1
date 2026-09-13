@@ -1,4 +1,4 @@
-// Firebase Configuration (تم ربطه ببيانات مشروعك الخاصة)
+// Firebase Configuration
 const firebaseConfig = {
     apiKey: "AIzaSyD0uoLQDS40S8Am8WYdLOfFxEsQuhqQPLQ",
     authDomain: "photoshop-e8266.firebaseapp.com",
@@ -10,18 +10,15 @@ const firebaseConfig = {
     measurementId: "G-J1XE0B32HN"
 };
 
-// Initialize Firebase safely
 if (typeof firebase !== 'undefined' && firebase.apps.length === 0) {
     firebase.initializeApp(firebaseConfig);
 }
 
 const db = (typeof firebase !== 'undefined' && firebase.firestore) ? firebase.firestore() : null;
 
-// Global array for dynamic admin-created session types
 let dynamicSessionTypes = [];
 let currentLang = 'fr';
 
-// Language Translations
 const translations = {
     fr: {
         navGallery: "Galerie",
@@ -35,8 +32,8 @@ const translations = {
         galleryTitle: "Travaux Récents",
         aboutSub: "À PROPOS DE NOUS",
         aboutTitle: "Capturer L'Émotion Avec Passion & Précision",
-        aboutDesc1: "Fondé sur une passion pour l'art visuel et le storytelling, notre studio s'efforce de capturer la véritable essence de vos moments les plus précieux. Nous croyons que chaque photographie doit raconter une histoire intemporelle.",
-        aboutDesc2: "Que ce soit pour votre mariage, un portrait professionnel ou un événement d'exception, nous combinons une approche artistique raffinée avec des équipements de pointe pour vous offrir une qualité irréprochable.",
+        aboutDesc1: "Fondé sur une passion pour l'art visuel et le storytelling, notre studio s'efforce de capturer la véritable essence de vos moments les plus précieux.",
+        aboutDesc2: "Que ce soit pour votre mariage, un portrait professionnel ou un événement d'exception, nous combinons une approche artistique raffinée avec des équipements de pointe.",
         feat1: '<i class="fa-solid fa-camera"></i> Matériel Professionnel High-End',
         feat2: '<i class="fa-solid fa-wand-magic-sparkles"></i> Retouche Artistique Soignée',
         langBtn: '<i class="fa-solid fa-globe"></i> <span>العربية</span>',
@@ -60,8 +57,8 @@ const translations = {
         galleryTitle: "أعمالنا الأخيرة",
         aboutSub: "من نحن",
         aboutTitle: "نلتقط المشاعر بشغف ودقة",
-        aboutDesc1: "تأسس استوديونا على شغف بالفن البصري وسرد القصص، ونسعى للتقاط الجوهر الحقيقي لأغلى لحظاتكم. نؤمن بأن كل صورة يجب أن تحكي قصة لا تُنسى.",
-        aboutDesc2: "سواء كان لحفل زفافك، بورترييه احترافي، أو مناسبة خاصة، نحن نجمع بين اللمسة الفنية الراقية وأحدث المعدات لنقدم لك جودة لا مثيل لها.",
+        aboutDesc1: "تأسس استوديونا على شغف بالفن البصري وسرد القصص، ونسعى للتقاط الجوهر الحقيقي لأغلى لحظاتكم.",
+        aboutDesc2: "سواء كان لحفل زفافك، بورترييه احترافي، أو مناسبة خاصة، نحن نجمع بين اللمسة الفنية الراقية وأحدث المعدات.",
         feat1: '<i class="fa-solid fa-camera"></i> معدات احترافية عالية الجودة',
         feat2: '<i class="fa-solid fa-wand-magic-sparkles"></i> تعديل فني دقيق',
         langBtn: '<i class="fa-solid fa-globe"></i> <span>Français</span>',
@@ -82,38 +79,36 @@ function toggleLanguage() {
     
     const t = translations[currentLang];
     
-    document.getElementById('navGallery').innerText = t.navGallery;
-    document.getElementById('navAbout').innerText = t.navAbout;
-    document.getElementById('navContact').innerText = t.navContact;
-    document.getElementById('heroTagline').innerText = t.heroTagline;
-    document.getElementById('heroTitle').innerHTML = t.heroTitle;
-    document.getElementById('heroDesc').innerText = t.heroDesc;
-    document.getElementById('btnBook').innerText = t.btnBook;
-    document.getElementById('btnCall').innerText = t.btnCall;
-    document.getElementById('galleryTitle').innerText = t.galleryTitle;
-    document.getElementById('aboutSub').innerText = t.aboutSub;
-    document.getElementById('aboutTitle').innerText = t.aboutTitle;
-    document.getElementById('aboutDesc1').innerText = t.aboutDesc1;
-    document.getElementById('aboutDesc2').innerText = t.aboutDesc2;
-    document.getElementById('feat1').innerHTML = t.feat1;
-    document.getElementById('feat2').innerHTML = t.feat2;
-    document.getElementById('langToggle').innerHTML = t.langBtn;
-    document.getElementById('modalTitle').innerText = t.modalTitle;
-    document.getElementById('modalDesc').innerText = t.modalDesc;
-    document.getElementById('lblNama').innerText = t.lblNama;
-    document.getElementById('lblPhone').innerText = t.lblPhone;
-    document.getElementById('lblType').innerText = t.lblType;
-    document.getElementById('lblDateTime').innerText = t.lblDateTime;
-    document.getElementById('btnSubmit').innerText = t.btnSubmit;
+    if (document.getElementById('navGallery')) document.getElementById('navGallery').innerText = t.navGallery;
+    if (document.getElementById('navAbout')) document.getElementById('navAbout').innerText = t.navAbout;
+    if (document.getElementById('navContact')) document.getElementById('navContact').innerText = t.navContact;
+    if (document.getElementById('heroTagline')) document.getElementById('heroTagline').innerText = t.heroTagline;
+    if (document.getElementById('heroTitle')) document.getElementById('heroTitle').innerHTML = t.heroTitle;
+    if (document.getElementById('heroDesc')) document.getElementById('heroDesc').innerText = t.heroDesc;
+    if (document.getElementById('btnBook')) document.getElementById('btnBook').innerText = t.btnBook;
+    if (document.getElementById('btnCall')) document.getElementById('btnCall').innerText = t.btnCall;
+    if (document.getElementById('galleryTitle')) document.getElementById('galleryTitle').innerText = t.galleryTitle;
+    if (document.getElementById('aboutSub')) document.getElementById('aboutSub').innerText = t.aboutSub;
+    if (document.getElementById('aboutTitle')) document.getElementById('aboutTitle').innerText = t.aboutTitle;
+    if (document.getElementById('aboutDesc1')) document.getElementById('aboutDesc1').innerText = t.aboutDesc1;
+    if (document.getElementById('aboutDesc2')) document.getElementById('aboutDesc2').innerText = t.aboutDesc2;
+    if (document.getElementById('feat1')) document.getElementById('feat1').innerHTML = t.feat1;
+    if (document.getElementById('feat2')) document.getElementById('feat2').innerHTML = t.feat2;
+    if (document.getElementById('langToggle')) document.getElementById('langToggle').innerHTML = t.langBtn;
+    if (document.getElementById('modalTitle')) document.getElementById('modalTitle').innerText = t.modalTitle;
+    if (document.getElementById('modalDesc')) document.getElementById('modalDesc').innerText = t.modalDesc;
+    if (document.getElementById('lblNama')) document.getElementById('lblNama').innerText = t.lblNama;
+    if (document.getElementById('lblPhone')) document.getElementById('lblPhone').innerText = t.lblPhone;
+    if (document.getElementById('lblType')) document.getElementById('lblType').innerText = t.lblType;
+    if (document.getElementById('lblDateTime')) document.getElementById('lblDateTime').innerText = t.lblDateTime;
+    if (document.getElementById('btnSubmit')) document.getElementById('btnSubmit').innerText = t.btnSubmit;
 
     renderSelectTypes();
 }
 
-// Fetch session types from local storage and Firestore
 function loadSessionTypes() {
     dynamicSessionTypes = [];
 
-    // 1. Check LocalStorage
     const localData = localStorage.getItem('session_types') || localStorage.getItem('types');
     if (localData) {
         try {
@@ -126,11 +121,10 @@ function loadSessionTypes() {
                 renderSelectTypes();
             }
         } catch (e) {
-            console.error("Error reading localStorage:", e);
+            console.error("Local Storage Error:", e);
         }
     }
 
-    // 2. Check Firestore
     if (db) {
         const possibleCollections = ['session_types', 'types', 'categories', 'sessionTypes'];
         possibleCollections.forEach(colName => {
@@ -174,11 +168,15 @@ function renderSelectTypes() {
 }
 
 function openModal() {
-    document.getElementById('bookingModal').classList.add('active');
+    if (document.getElementById('bookingModal')) {
+        document.getElementById('bookingModal').classList.add('active');
+    }
 }
 
 function closeModal() {
-    document.getElementById('bookingModal').classList.remove('active');
+    if (document.getElementById('bookingModal')) {
+        document.getElementById('bookingModal').classList.remove('active');
+    }
 }
 
 function handleFormSubmit(e) {
@@ -188,25 +186,28 @@ function handleFormSubmit(e) {
     const type = document.getElementById('inputType').value;
     const datetime = document.getElementById('inputDateTime').value;
 
+    const bookingData = {
+        name: name,
+        phone: phone,
+        type: type,
+        datetime: datetime,
+        createdAt: new Date().toISOString()
+    };
+
+    const localBookings = JSON.parse(localStorage.getItem('admin_bookings') || '[]');
+    localBookings.push(bookingData);
+    localStorage.setItem('admin_bookings', JSON.stringify(localBookings));
+
     if (db) {
         db.collection('bookings').add({
-            name: name,
-            phone: phone,
-            type: type,
-            datetime: datetime,
+            ...bookingData,
             createdAt: firebase.firestore.FieldValue.serverTimestamp()
-        }).then(() => {
-            alert(currentLang === 'fr' ? 'Réservation envoyée avec succès!' : 'تم إرسال طلب الحجز بنجاح!');
-            closeModal();
-            e.target.reset();
-        }).catch(err => {
-            alert(currentLang === 'fr' ? 'Réservation envoyée avec succès!' : 'تم إرسال طلب الحجز بنجاح!');
-            closeModal();
-        });
-    } else {
-        alert(currentLang === 'fr' ? 'Réservation envoyée avec succès!' : 'تم إرسال طلب الحجز بنجاح!');
-        closeModal();
+        }).catch(err => console.error(err));
     }
+
+    alert(currentLang === 'fr' ? 'Réservation envoyée avec succès!' : 'تم إرسال طلب الحجز بنجاح!');
+    closeModal();
+    e.target.reset();
 }
 
 function loadGallery() {
@@ -224,7 +225,7 @@ function loadGallery() {
             card.innerHTML = `
                 <img src="${item.imageUrl || item.url || ''}" alt="${item.title || 'Photo'}">
                 <div class="card-overlay">
-                    <span class="category">${(item.category || 'MARIAGE').toUpperCase()}</span>
+                    <span class="category">${(item.category || ' MARIAGE ').toUpperCase()}</span>
                     <h3>${item.title || 'Studio Series'}</h3>
                 </div>
             `;
