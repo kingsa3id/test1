@@ -597,5 +597,37 @@
 
     <!-- Script Logic -->
     <script src="script.js"></script>
+    <!-- ================= SOCIAL MEDIA FLOATING BUBBLES ================= -->
+<div id="floatingBubbles" class="fixed bottom-6 left-6 z-50 flex flex-col gap-3">
+    <!-- سيتم تعبئتها ديناميكياً من الجافاسكريبت بناءً على إعدادات الأدمن -->
+</div>
+
+<!-- ================= ADMIN PANEL MODAL ================= -->
+<div id="adminModal" class="fixed inset-0 bg-black/70 z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-zinc-900 text-white w-full max-w-lg rounded-2xl p-6 border border-zinc-700 shadow-2xl relative">
+        <button id="closeAdminBtn" class="absolute top-4 left-4 text-zinc-400 hover:text-white text-xl">&times;</button>
+        <h3 class="text-xl font-bold mb-4 text-accent">لوحة تحكم الإعدادات (Admin Panel)</h3>
+        
+        <form id="adminSettingsForm" class="space-y-4">
+            <div>
+                <label class="block text-sm mb-1">رقم الهاتف الأساسي للاستوديو:</label>
+                <input type="text" id="adminMainPhone" class="w-full bg-zinc-800 border border-zinc-700 rounded-lg p-2.5 text-white" placeholder="0550123456">
+            </div>
+            <div>
+                <label class="block text-sm mb-1">رابط واتساب (WhatsApp Link):</label>
+                <input type="text" id="adminWhatsapp" class="w-full bg-zinc-800 border border-zinc-700 rounded-lg p-2.5 text-white" placeholder="https://wa.me/213550000000">
+            </div>
+            <div>
+                <label class="block text-sm mb-1">رابط انستغرام (Instagram Link):</label>
+                <input type="text" id="adminInstagram" class="w-full bg-zinc-800 border border-zinc-700 rounded-lg p-2.5 text-white" placeholder="https://instagram.com/yourstudio">
+            </div>
+            <div>
+                <label class="block text-sm mb-1">رابط تيليجرام (Telegram Link):</label>
+                <input type="text" id="adminTelegram" class="w-full bg-zinc-800 border border-zinc-700 rounded-lg p-2.5 text-white" placeholder="https://t.me/yourusername">
+            </div>
+            <button type="submit" class="w-full bg-accent text-zinc-950 font-bold py-3 rounded-lg hover:opacity-95 transition">حفظ التغييرات</button>
+        </form>
+    </div>
+</div>
 </body>
 </html>
