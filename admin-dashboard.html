@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Tableau de Bord Admin</title>
+    <style>
+        body { font-family: sans-serif; background: #121212; color: #fff; padding: 2rem; }
+        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; padding-bottom: 1rem; }
+        .card { background: #1e1e1e; padding: 1.5rem; border-radius: 8px; margin-top: 1.5rem; max-width: 500px; }
+        input { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #333; border-radius: 4px; background: #2a2a2a; color: #fff; box-sizing: border-box; }
+        button { padding: 10px 15px; background: #d4af37; border: none; color: #000; font-weight: bold; border-radius: 4px; cursor: pointer; }
+        .btn-danger { background: #ff4444; color: #fff; margin-left: 10px; }
+        ul { list-style: none; padding: 0; }
+        li { display: flex; justify-content: space-between; align-items: center; background: #2a2a2a; padding: 10px; margin-bottom: 8px; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h2>Tableau de Bord</h2>
+        <div>
+            <span id="currentUserEmail"></span>
+            <button onclick="logoutAdmin()" class="btn-danger">Déconnexion</button>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>Ajouter un Administrateur</h3>
+        <form onsubmit="handleCreateUser(event)">
+            <input type="email" id="newEmail" placeholder="Nouvel Email" required>
+            <input type="password" id="newPassword" placeholder="Mot de passe" required minlength="4">
+            <button type="submit">Créer le compte</button>
+        </form>
+    </div>
+
+    <div class="card">
+        <h3>Liste des Administrateurs</h3>
+        <ul id="adminList"></ul>
+    </div>
+
+    <script src="admin.js"></script>
+    <script>
+        protectPage();
+        renderAdminList();
+    </script>
+</body>
+</html>
