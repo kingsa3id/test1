@@ -1,5 +1,5 @@
 // ==========================================
-// 1. FIREBASE CONFIGURATION & INITIALIZATION
+// 1. FIREBASE CONFIGURATION
 // ==========================================
 const firebaseConfig = {
     apiKey: "AIzaSyD0uoLQDS40S8Am8WYdLOfFxEsQuhqQPLQ",
@@ -23,39 +23,97 @@ try {
         }
     }
 } catch (err) {
-    console.warn("Firebase fallback mode:", err);
+    console.warn("Firebase mode fallback:", err);
 }
 
 // ==========================================
-// 2. DOM INITIALIZATION & SITE INTERACTION
+// 2. INITIALIZATION & UI EVENTS
 // ==========================================
 document.addEventListener('DOMContentLoaded', () => {
-    // Load dynamic session types into form select
+    // 1. Initialize Language System
+    initLanguageSystem();
+
+    // 2. Load Session Types into Dropdown
     loadSessionTypes();
 
-    // Attach submit listener to booking form
+    // 3. Setup Booking Buttons & Smooth Scrolling
+    setupBookingButtons();
+
+    // 4. Attach Form Submit Listener
     const bookingForm = document.getElementById('bookingForm');
     if (bookingForm) {
         bookingForm.addEventListener('submit', handleBookingSubmit);
     }
-
-    // Enable Smooth Scroll for site links
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
-            const targetId = this.getAttribute('href');
-            if (targetId && targetId !== '#') {
-                const targetElement = document.querySelector(targetId);
-                if (targetElement) {
-                    e.preventDefault();
-                    targetElement.scrollIntoView({ behavior: 'smooth' });
-                }
-            }
-        });
-    });
 });
 
 // ==========================================
-// 3. SESSION TYPES DROPDOWN LOGIC
+// 3. LANGUAGE SWITCHER SYSTEM (AR / FR)
+// ==========================================
+let currentLang = localStorage.getItem('site_lang') || 'fr';
+
+function initLanguageSystem() {
+    applyLanguage(currentLang);
+
+    // Find language toggle button by ID or Class
+    const langBtn = document.getElementById('langToggle') || document.querySelector('.lang-btn');
+    if (langBtn) {
+        langBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            currentLang = (currentLang === 'fr') ? 'ar' : 'fr';
+            localStorage.setItem('site_lang', currentLang);
+            applyLanguage(currentLang);
+        });
+    }
+}
+
+function applyLanguage(lang) {
+    document.documentElement.lang = lang;
+    document.documentElement.dir = (lang === 'ar') ? 'rtl' : 'ltr';
+
+    // Translate elements with data-fr and data-ar attributes
+    document.querySelectorAll('[data-fr][data-ar]').forEach(el => {
+        const text = el.getAttribute(`data-${lang}`);
+        if (text) {
+            if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+                el.placeholder = text;
+            } else {
+                el.textContent = text;
+            }
+        }
+    });
+
+    // Update Language Button Text if exists
+    const langBtn = document.getElementById('langToggle') || document.querySelector('.lang-btn');
+    if (langBtn) {
+        langBtn.textContent = (lang === 'fr') ? 'العربية' : 'Français';
+    }
+}
+
+// ==========================================
+// 4. BOOKING BUTTONS & NAVIGATION
+// ==========================================
+function setupBookingButtons() {
+    // Scroll smoothly to booking section when clicking reserve buttons
+    document.querySelectorAll('a[href^="#"], .btn-book, .btn-reserve').forEach(btn => {
+        btn.addEventListener('click', function (e) {
+            const href = this.getAttribute('href');
+            let targetId = href;
+
+            if (!targetId || targetId === '#') {
+                targetId = '#booking';
+            }
+
+            const targetEl = document.querySelector(targetId) || document.getElementById('bookingForm');
+            if (targetEl) {
+                e.preventDefault();
+                targetEl.scrollIntoView({ behavior: 'smooth' });
+            }
+        });
+    });
+}
+
+// ==========================================
+// 5. LOAD SESSION TYPES
 // ==========================================
 function loadSessionTypes() {
     const typeSelect = document.getElementById('bookingType');
@@ -82,10 +140,7 @@ function loadSessionTypes() {
             } else {
                 populateLocalTypes(typeSelect, defaultTypes);
             }
-        }, err => {
-            console.warn("Firestore listener error, using local fallback:", err);
-            populateLocalTypes(typeSelect, defaultTypes);
-        });
+        }, () => populateLocalTypes(typeSelect, defaultTypes));
     } else {
         populateLocalTypes(typeSelect, defaultTypes);
     }
@@ -97,18 +152,17 @@ function populateLocalTypes(selectElement, fallbackTypes) {
 }
 
 function populateTypeOptions(selectElement, types) {
-    selectElement.innerHTML = '<option value="">-- Choisissez un type de séance --</option>';
+    selectElement.innerHTML = `<option value="">-- ${currentLang === 'ar' ? 'اختر نوع الجلسة' : 'Choisissez un type de séance'} --</option>`;
     types.forEach(item => {
         const option = document.createElement('option');
-        const label = item.ar ? `${item.fr} (${item.ar})` : item.fr;
         option.value = item.fr;
-        option.textContent = label;
+        option.textContent = (currentLang === 'ar' && item.ar) ? item.ar : item.fr;
         selectElement.appendChild(option);
     });
 }
 
 // ==========================================
-// 4. BOOKING & STRICT DOUBLE-BOOKING CHECK
+// 6. SUBMIT & DOUBLE-BOOKING PREVENTION
 // ==========================================
 async function handleBookingSubmit(e) {
     e.preventDefault();
@@ -126,43 +180,45 @@ async function handleBookingSubmit(e) {
     const datetime = dateTimeInput ? dateTimeInput.value : '';
 
     if (!name || !phone || !type || !datetime) {
-        alert("Veuillez remplir tous les champs obligatoires.");
+        const msg = (currentLang === 'ar') ? "يرجى ملء جميع الحقول المطلوبة." : "Veuillez remplir tous les champs obligatoires.";
+        alert(msg);
         return;
     }
 
     if (submitBtn) submitBtn.disabled = true;
 
     try {
-        // 1. Check LocalStorage for duplicate time slot
+        // 1. Check LocalStorage for time conflict
         const localBookings = JSON.parse(localStorage.getItem('admin_bookings') || '[]');
         const isConflictLocal = localBookings.some(b => b.datetime === datetime);
 
         if (isConflictLocal) {
-            alert("Ce créneau horaire est déjà réservé ! Veuillez choisir une autre date ou heure.");
+            const msgConflict = (currentLang === 'ar') 
+                ? "هذا الموعد محجوز بالفعل! يرجى اختيار تاريخ أو وقت آخر." 
+                : "Ce créneau horaire est déjà réservé ! Veuillez choisir une autre date ou heure.";
+            alert(msgConflict);
             if (submitBtn) submitBtn.disabled = false;
             return;
         }
 
-        // 2. Check Firebase Firestore with a 3-second timeout guard
+        // 2. Check Firebase Firestore for time conflict
         if (db) {
-            const checkQuery = db.collection('bookings').where('datetime', '==', datetime).get();
-            const timeoutPromise = new Promise((_, reject) => 
-                setTimeout(() => reject(new Error("Timeout")), 3000)
-            );
-
             try {
-                const snapshot = await Promise.race([checkQuery, timeoutPromise]);
-                if (snapshot && !snapshot.empty) {
-                    alert("Ce créneau horaire est déjà réservé ! Veuillez choisir une autre date ou heure.");
+                const snapshot = await db.collection('bookings').where('datetime', '==', datetime).get();
+                if (!snapshot.empty) {
+                    const msgConflict = (currentLang === 'ar') 
+                        ? "هذا الموعد محجوز بالفعل! يرجى اختيار تاريخ أو وقت آخر." 
+                        : "Ce créneau horaire est déjà réservé ! Veuillez choisir une autre date ou heure.";
+                    alert(msgConflict);
                     if (submitBtn) submitBtn.disabled = false;
                     return;
                 }
             } catch (netErr) {
-                console.warn("Online check skipped, using local verification:", netErr);
+                console.warn("Firestore check skipped:", netErr);
             }
         }
 
-        // 3. Save the valid booking
+        // 3. Save new booking if available
         const newBooking = {
             name: name,
             phone: phone,
@@ -175,15 +231,17 @@ async function handleBookingSubmit(e) {
         localStorage.setItem('admin_bookings', JSON.stringify(localBookings));
 
         if (db) {
-            db.collection('bookings').add(newBooking).catch(err => console.error("Firestore save err:", err));
+            db.collection('bookings').add(newBooking).catch(err => console.error(err));
         }
 
-        alert("Réservation effectuée avec succès !");
+        const msgSuccess = (currentLang === 'ar') ? "تم الحجز بنجاح!" : "Réservation effectuée avec succès !";
+        alert(msgSuccess);
         e.target.reset();
 
     } catch (err) {
-        console.error("Booking handler error:", err);
-        alert("Une erreur est survenue. Veuillez réessayer.");
+        console.error("Booking error:", err);
+        const msgErr = (currentLang === 'ar') ? "حدث خطأ، يرجى المحاولة مرة أخرى." : "Une erreur est survenue. Veuillez réessayer.";
+        alert(msgErr);
     } finally {
         if (submitBtn) submitBtn.disabled = false;
     }
