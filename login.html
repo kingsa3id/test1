@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Connexion Administration</title>
+    <style>
+        body { font-family: sans-serif; background: #121212; color: #fff; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .login-card { background: #1e1e1e; padding: 2rem; border-radius: 8px; width: 320px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #333; border-radius: 4px; background: #2a2a2a; color: #fff; box-sizing: border-box; }
+        button { width: 100%; padding: 10px; background: #d4af37; border: none; color: #000; font-weight: bold; border-radius: 4px; cursor: pointer; margin-top: 10px; }
+        button:hover { background: #b89628; }
+        .error { color: #ff5555; font-size: 0.9rem; display: none; margin-top: 10px; text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="login-card">
+        <h2>Connexion Admin</h2>
+        <form onsubmit="handleLogin(event)">
+            <input type="email" id="loginEmail" placeholder="Email" required>
+            <input type="password" id="loginPassword" placeholder="Mot de passe" required>
+            <button type="submit">Se connecter</button>
+        </form>
+        <div id="errorMessage" class="error">Email ou mot de passe incorrect.</div>
+    </div>
+    <script src="admin.js"></script>
+</body>
+</html>
