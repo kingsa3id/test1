@@ -492,7 +492,7 @@
             <li><a href="#contact" id="navContact">Contact</a></li>
         </ul>
         <div class="nav-btns">
-            <button class="btn-lang" id="langToggle" onclick="toggleLanguage()"><i class="fa-solid fa-globe"></i> <span>العربية</span></button>
+            <button class="btn-lang" id="langToggle"><i class="fa-solid fa-globe"></i> <span>العربية</span></button>
         </div>
     </nav>
 
@@ -503,7 +503,7 @@
             <h1 id="heroTitle">Saisir Des Moments <br><span class="text-accent">Intemporels</span></h1>
             <p id="heroDesc">Photographie d'art pour mariages, portraits de prestige et événements.</p>
             <div class="hero-btns">
-                <button class="btn-primary" id="btnBook" onclick="openModal()">Réserver une séance</button>
+                <button class="btn-primary" id="btnBook">Réserver une séance</button>
                 <a href="tel:+213000000000" class="btn-secondary" id="btnCall">Appeler maintenant</a>
             </div>
         </div>
@@ -565,11 +565,11 @@
     <!-- Booking Modal -->
     <div class="modal" id="bookingModal">
         <div class="modal-content">
-            <span class="close-btn" onclick="closeModal()">&times;</span>
+            <span class="close-btn" id="closeModalBtn">&times;</span>
             <h3 id="modalTitle" style="margin-bottom: 0.5rem; font-family: var(--font-serif); font-size: 1.5rem;">Réserver une séance photo</h3>
             <p id="modalDesc" style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 1.5rem;">Complétez le formulaire ci-dessous pour réserver votre date.</p>
 
-            <form onsubmit="handleFormSubmit(event)">
+            <form id="bookingForm">
                 <div class="form-group">
                     <label id="lblNama">Nom complet</label>
                     <input type="text" id="inputName" required>
@@ -584,7 +584,7 @@
                 </div>
                 <div class="form-group">
                     <label id="lblDateTime">Date et Heure de la séance</label>
-                    <input type="datetime-local" id="inputDateTime" required onclick="this.showPicker()" style="cursor: pointer;">
+                    <input type="datetime-local" id="inputDateTime" required style="cursor: pointer;">
                 </div>
                 <button type="submit" class="btn-primary" id="btnSubmit" style="width: 100%; margin-top: 1rem;">Confirmer la réservation</button>
             </form>
