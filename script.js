@@ -1,4 +1,3 @@
-
 // Firebase Configuration
 const firebaseConfig = {
     apiKey: "AIzaSyD0uoLQDS40S8Am8WYdLOfFxEsQuhqQPLQ",
@@ -79,9 +78,11 @@ function populateTypeOptions(selectElement, types) {
     });
 }
 
-// Handle Booking Form Submission
+// Handle Booking Form Submission with Strict Double-Booking Prevention
 async function handleBookingSubmit(e) {
     e.preventDefault();
+
+    const submitBtn = e.target.querySelector('button[type="submit"]');
 
     const nameInput = document.getElementById('bookingName');
     const phoneInput = document.getElementById('bookingPhone');
@@ -98,47 +99,53 @@ async function handleBookingSubmit(e) {
         return;
     }
 
-    // 1. Check for double-booking in LocalStorage
-    const localBookings = JSON.parse(localStorage.getItem('admin_bookings') || '[]');
-    const isConflictLocal = localBookings.some(b => b.datetime === datetime);
+    // Disable button during check to prevent duplicate clicks
+    if (submitBtn) submitBtn.disabled = true;
 
-    if (isConflictLocal) {
-        alert("Ce créneau horaire est déjà réservé ! Veuillez choisir une autre date ou heure.");
-        return;
-    }
+    try {
+        // 1. Check in LocalStorage
+        const localBookings = JSON.parse(localStorage.getItem('admin_bookings') || '[]');
+        const isConflictLocal = localBookings.some(b => b.datetime === datetime);
 
-    // 2. Check for double-booking in Firebase Firestore
-    if (db) {
-        try {
+        if (isConflictLocal) {
+            alert("Ce créneau horaire est déjà réservé ! Veuillez choisir une autre date ou heure.");
+            if (submitBtn) submitBtn.disabled = false;
+            return;
+        }
+
+        // 2. Check in Firebase Firestore
+        if (db) {
             const snapshot = await db.collection('bookings').where('datetime', '==', datetime).get();
             if (!snapshot.empty) {
                 alert("Ce créneau horaire est déjà réservé ! Veuillez choisir une autre date ou heure.");
+                if (submitBtn) submitBtn.disabled = false;
                 return;
             }
-        } catch (err) {
-            console.error("Erreur de vérification Firestore:", err);
         }
-    }
 
-    // 3. Save new booking
-    const newBooking = {
-        name: name,
-        phone: phone,
-        type: type,
-        datetime: datetime,
-        createdAt: new Date().toISOString()
-    };
+        // 3. Save new booking if slot is free
+        const newBooking = {
+            name: name,
+            phone: phone,
+            type: type,
+            datetime: datetime,
+            createdAt: new Date().toISOString()
+        };
 
-    localBookings.push(newBooking);
-    localStorage.setItem('admin_bookings', JSON.stringify(localBookings));
+        localBookings.push(newBooking);
+        localStorage.setItem('admin_bookings', JSON.stringify(localBookings));
 
-    if (db) {
-        db.collection('bookings').add(newBooking)
-          .then(() => alert("Réservation effectuée avec succès !"))
-          .catch(err => console.error("Erreur de sauvegarde:", err));
-    } else {
+        if (db) {
+            await db.collection('bookings').add(newBooking);
+        }
+
         alert("Réservation effectuée avec succès !");
-    }
+        e.target.reset();
 
-    e.target.reset();
+    } catch (err) {
+        console.error("Erreur de vérification:", err);
+        alert("Une erreur est survenue lors de la vérification. Veuillez réessayer.");
+    } finally {
+        if (submitBtn) submitBtn.disabled = false;
+    }
 }
