@@ -1,11 +1,13 @@
-// Firebase Configuration & Initialization
+// Firebase Configuration (تم ربطه ببيانات مشروعك الخاصة)
 const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_PROJECT_ID.appspot.com",
-    messagingSenderId: "YOUR_SENDER_ID",
-    appId: "YOUR_APP_ID"
+    apiKey: "AIzaSyD0uoLQDS40S8Am8WYdLOfFxEsQuhqQPLQ",
+    authDomain: "photoshop-e8266.firebaseapp.com",
+    databaseURL: "https://photoshop-e8266-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "photoshop-e8266",
+    storageBucket: "photoshop-e8266.firebasestorage.app",
+    messagingSenderId: "783007614918",
+    appId: "1:783007614918:web:31741b0b4880bc8681f4c7",
+    measurementId: "G-J1XE0B32HN"
 };
 
 // Initialize Firebase safely
@@ -15,10 +17,11 @@ if (typeof firebase !== 'undefined' && firebase.apps.length === 0) {
 
 const db = (typeof firebase !== 'undefined' && firebase.firestore) ? firebase.firestore() : null;
 
-// Global state for dynamic session types fetched from Firestore
+// Global array for dynamic admin-created session types
 let dynamicSessionTypes = [];
+let currentLang = 'fr';
 
-// Translations
+// Language Translations
 const translations = {
     fr: {
         navGallery: "Galerie",
@@ -43,8 +46,7 @@ const translations = {
         lblPhone: "Numéro de téléphone",
         lblType: "Type de séance",
         lblDateTime: "Date et Heure de la séance",
-        btnSubmit: "Confirmer la réservation",
-        fallbackTypes: ["Mariage", "Portrait", "Événement", "Autre"]
+        btnSubmit: "Confirmer la réservation"
     },
     ar: {
         navGallery: "المعرض",
@@ -69,12 +71,9 @@ const translations = {
         lblPhone: "رقم الهاتف",
         lblType: "نوع الجلسة",
         lblDateTime: "تاريخ ووقت الجلسة",
-        btnSubmit: "تأكيد الحجز",
-        fallbackTypes: ["زفاف", "بورتريه", "مناسبة", "آخر"]
+        btnSubmit: "تأكيد الحجز"
     }
 };
-
-let currentLang = 'fr';
 
 function toggleLanguage() {
     currentLang = currentLang === 'fr' ? 'ar' : 'fr';
@@ -110,66 +109,68 @@ function toggleLanguage() {
     renderSelectTypes();
 }
 
-// Fetch dynamic types from Firestore across all possible collection & field structures
+// Fetch session types from local storage and Firestore
 function loadSessionTypes() {
-    if (!db) {
-        renderSelectTypes();
-        return;
-    }
+    dynamicSessionTypes = [];
 
-    const possibleCollections = ['session_types', 'types', 'categories', 'sessionTypes'];
-
-    possibleCollections.forEach(colName => {
-        db.collection(colName).onSnapshot(snapshot => {
-            if (!snapshot || snapshot.empty) return;
-
-            dynamicSessionTypes = [];
-            snapshot.docs.forEach(doc => {
-                const data = doc.data();
-                
-                // Detect French text field variations
-                const frVal = data.fr || data.nameFr || data.french || data.titleFr || data.name_fr || data.title || '';
-                // Detect Arabic text field variations
-                const arVal = data.ar || data.nameAr || data.arabic || data.titleAr || data.name_ar || frVal;
-
-                if (frVal || arVal) {
-                    dynamicSessionTypes.push({ fr: frVal, ar: arVal });
-                }
-            });
-
-            if (dynamicSessionTypes.length > 0) {
+    // 1. Check LocalStorage
+    const localData = localStorage.getItem('session_types') || localStorage.getItem('types');
+    if (localData) {
+        try {
+            const parsed = JSON.parse(localData);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+                dynamicSessionTypes = parsed.map(item => ({
+                    fr: item.fr || item.nameFr || item.french || item.title || '',
+                    ar: item.ar || item.nameAr || item.arabic || item.titleAr || item.fr || ''
+                }));
                 renderSelectTypes();
             }
-        }, error => {
-            // Ignore missing collections silently
+        } catch (e) {
+            console.error("Error reading localStorage:", e);
+        }
+    }
+
+    // 2. Check Firestore
+    if (db) {
+        const possibleCollections = ['session_types', 'types', 'categories', 'sessionTypes'];
+        possibleCollections.forEach(colName => {
+            db.collection(colName).onSnapshot(snapshot => {
+                if (!snapshot || snapshot.empty) return;
+
+                const fetched = [];
+                snapshot.docs.forEach(doc => {
+                    const data = doc.data();
+                    const frVal = data.fr || data.nameFr || data.french || data.titleFr || data.name_fr || data.title || '';
+                    const arVal = data.ar || data.nameAr || data.arabic || data.titleAr || data.name_ar || frVal;
+
+                    if (frVal || arVal) {
+                        fetched.push({ fr: frVal, ar: arVal });
+                    }
+                });
+
+                if (fetched.length > 0) {
+                    dynamicSessionTypes = fetched;
+                    renderSelectTypes();
+                }
+            }, err => {});
         });
-    });
+    }
 }
 
-// Render dynamic session options into the select dropdown
 function renderSelectTypes() {
     const select = document.getElementById('inputType');
     if (!select) return;
     select.innerHTML = '';
 
-    if (dynamicSessionTypes.length > 0) {
-        dynamicSessionTypes.forEach(item => {
-            const label = currentLang === 'ar' ? (item.ar || item.fr) : (item.fr || item.ar);
-            if (label) {
-                const option = document.createElement('option');
-                option.value = label;
-                option.textContent = label;
-                select.appendChild(option);
-            }
-        });
-    } else {
-        translations[currentLang].fallbackTypes.forEach(type => {
+    dynamicSessionTypes.forEach(item => {
+        const label = currentLang === 'ar' ? (item.ar || item.fr) : (item.fr || item.ar);
+        if (label) {
             const option = document.createElement('option');
-            option.value = type;
-            option.textContent = type;
+            option.value = label;
+            option.textContent = label;
             select.appendChild(option);
-        });
-    }
+        }
+    });
 }
 
 function openModal() {
@@ -199,7 +200,6 @@ function handleFormSubmit(e) {
             closeModal();
             e.target.reset();
         }).catch(err => {
-            console.error("Booking submission error:", err);
             alert(currentLang === 'fr' ? 'Réservation envoyée avec succès!' : 'تم إرسال طلب الحجز بنجاح!');
             closeModal();
         });
@@ -209,7 +209,6 @@ function handleFormSubmit(e) {
     }
 }
 
-// Load Gallery Data from Firestore
 function loadGallery() {
     const galleryGrid = document.getElementById('galleryGrid');
     if (!galleryGrid || !db) return;
@@ -234,7 +233,6 @@ function loadGallery() {
     });
 }
 
-// Initialize on DOM Ready
 document.addEventListener('DOMContentLoaded', () => {
     loadSessionTypes();
     loadGallery();
