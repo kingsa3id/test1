@@ -87,11 +87,59 @@ const translations = {
 let currentLang = localStorage.getItem('site_lang') || 'fr';
 
 // ==========================================
-// 3. INITIALIZATION
+// 3. INITIALIZATION & EVENT LISTENERS
 // ==========================================
 document.addEventListener('DOMContentLoaded', () => {
+    // 1. Initialize Language & Types
     applyLanguage(currentLang);
     loadSessionTypes();
+
+    // 2. Language Button Event Listener
+    const langBtn = document.getElementById('langToggle');
+    if (langBtn) {
+        langBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            toggleLanguage();
+        });
+    }
+
+    // 3. Open Modal Event Listener
+    const btnBook = document.getElementById('btnBook');
+    if (btnBook) {
+        btnBook.addEventListener('click', (e) => {
+            e.preventDefault();
+            openModal();
+        });
+    }
+
+    // 4. Close Modal Event Listener
+    const closeModalBtn = document.getElementById('closeModalBtn');
+    if (closeModalBtn) {
+        closeModalBtn.addEventListener('click', closeModal);
+    }
+
+    window.addEventListener('click', (e) => {
+        const modal = document.getElementById('bookingModal');
+        if (e.target === modal) {
+            closeModal();
+        }
+    });
+
+    // 5. Form Submit Listener
+    const bookingForm = document.getElementById('bookingForm');
+    if (bookingForm) {
+        bookingForm.addEventListener('submit', handleFormSubmit);
+    }
+
+    // 6. Picker for DateTime Input
+    const dtInput = document.getElementById('inputDateTime');
+    if (dtInput) {
+        dtInput.addEventListener('click', () => {
+            if (typeof dtInput.showPicker === 'function') {
+                dtInput.showPicker();
+            }
+        });
+    }
 });
 
 // ==========================================
@@ -121,7 +169,6 @@ function applyLanguage(lang) {
         }
     }
 
-    // Update Language Button Text
     const langBtn = document.getElementById('langToggle');
     if (langBtn) {
         langBtn.innerHTML = `<i class="fa-solid fa-globe"></i> <span>${t.langBtnText}</span>`;
@@ -129,7 +176,7 @@ function applyLanguage(lang) {
 }
 
 // ==========================================
-// 5. MODAL CONTROL (OPEN / CLOSE)
+// 5. MODAL CONTROL
 // ==========================================
 function openModal() {
     const modal = document.getElementById('bookingModal');
@@ -144,14 +191,6 @@ function closeModal() {
         modal.classList.remove('active');
     }
 }
-
-// Close Modal when clicking outside
-window.addEventListener('click', (e) => {
-    const modal = document.getElementById('bookingModal');
-    if (e.target === modal) {
-        closeModal();
-    }
-});
 
 // ==========================================
 // 6. LOAD SESSION TYPES
