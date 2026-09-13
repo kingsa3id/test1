@@ -1,8 +1,22 @@
 // ==========================================
-// 0. TELEGRAM NOTIFICATION CONFIGURATION
+// 0. TELEGRAM & SITE CONFIGURATION
 // ==========================================
 const TELEGRAM_BOT_TOKEN = "8857198496:AAGy5eZcZF39ItjU3BZVsW0mrYnWPOoJ-Yo"; 
 const TELEGRAM_CHAT_ID = "7206996726";     
+
+// إعدادات افتراضية للتواصل الاجتماعي والهاتف
+const defaultSettings = {
+    mainPhone: "0550123456",
+    whatsapp: "https://wa.me/213550000000",
+    instagram: "https://instagram.com/",
+    telegram: "https://t.me/"
+};
+
+// جلب الإعدادات المخزنة أو استخدام الافتراضية
+function getSiteSettings() {
+    const saved = localStorage.getItem('site_settings');
+    return saved ? JSON.parse(saved) : defaultSettings;
+}
 
 // ==========================================
 // 1. FIREBASE CONFIGURATION
@@ -98,6 +112,8 @@ let currentLang = localStorage.getItem('site_lang') || 'fr';
 document.addEventListener('DOMContentLoaded', () => {
     applyLanguage(currentLang);
     loadSessionTypes();
+    renderFloatingBubbles();
+    setupAdminModalEvents();
 
     const langBtn = document.getElementById('langToggle');
     if (langBtn) {
@@ -125,6 +141,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.target === modal) {
             closeModal();
         }
+        const adminModal = document.getElementById('adminModal');
+        if (e.target === adminModal) {
+            closeAdminModal();
+        }
     });
 
     const bookingForm = document.getElementById('bookingForm');
@@ -143,7 +163,86 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // ==========================================
-// 4. LANGUAGE TOGGLE FUNCTION
+// 4. FLOATING BUBBLES & ADMIN SETTINGS
+// ==========================================
+function renderFloatingBubbles() {
+    const container = document.getElementById('floatingBubbles');
+    if (!container) return;
+
+    const settings = getSiteSettings();
+    container.innerHTML = '';
+
+    // زر واتساب العائم
+    if (settings.whatsapp) {
+        container.innerHTML += `
+            <a href="${settings.whatsapp}" target="_blank" class="w-12 h-12 bg-green-600 text-white rounded-full flex items-center justify-center text-xl shadow-lg hover:scale-110 transition">
+                <i class="fa-brands fa-whatsapp"></i>
+            </a>
+        `;
+    }
+
+    // زر انستغرام العائم
+    if (settings.instagram) {
+        container.innerHTML += `
+            <a href="${settings.instagram}" target="_blank" class="w-12 h-12 bg-pink-600 text-white rounded-full flex items-center justify-center text-xl shadow-lg hover:scale-110 transition">
+                <i class="fa-brands fa-instagram"></i>
+            </a>
+        `;
+    }
+
+    // زر اتصال سريع برقم الهاتف
+    if (settings.mainPhone) {
+        container.innerHTML += `
+            <a href="tel:${settings.mainPhone}" class="w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center text-xl shadow-lg hover:scale-110 transition" title="اتصل بنا">
+                <i class="fa-solid fa-phone"></i>
+            </a>
+        `;
+    }
+}
+
+function openAdminModal() {
+    const modal = document.getElementById('adminModal');
+    if (!modal) return;
+    
+    const settings = getSiteSettings();
+    document.getElementById('adminMainPhone').value = settings.mainPhone || '';
+    document.getElementById('adminWhatsapp').value = settings.whatsapp || '';
+    document.getElementById('adminInstagram').value = settings.instagram || '';
+    document.getElementById('adminTelegram').value = settings.telegram || '';
+
+    modal.classList.remove('hidden');
+}
+
+function closeAdminModal() {
+    const modal = document.getElementById('adminModal');
+    if (modal) modal.classList.add('hidden');
+}
+
+function setupAdminModalEvents() {
+    const closeBtn = document.getElementById('closeAdminBtn');
+    if (closeBtn) closeBtn.addEventListener('click', closeAdminModal);
+
+    const form = document.getElementById('adminSettingsForm');
+    if (form) {
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const newSettings = {
+                mainPhone: document.getElementById('adminMainPhone').value.trim(),
+                whatsapp: document.getElementById('adminWhatsapp').value.trim(),
+                instagram: document.getElementById('adminInstagram').value.trim(),
+                telegram: document.getElementById('adminTelegram').value.trim()
+            };
+
+            localStorage.setItem('site_settings', JSON.stringify(newSettings));
+            renderFloatingBubbles();
+            closeAdminModal();
+            alert("تم حفظ إعدادات الموقع وتحديث الفقاعات العائمة بنجاح!");
+        });
+    }
+}
+
+// ==========================================
+// 5. LANGUAGE TOGGLE FUNCTION
 // ==========================================
 function toggleLanguage() {
     currentLang = (currentLang === 'fr') ? 'ar' : 'fr';
@@ -176,24 +275,20 @@ function applyLanguage(lang) {
 }
 
 // ==========================================
-// 5. MODAL CONTROL
+// 6. MODAL CONTROL
 // ==========================================
 function openModal() {
     const modal = document.getElementById('bookingModal');
-    if (modal) {
-        modal.classList.add('active');
-    }
+    if (modal) modal.classList.add('active');
 }
 
 function closeModal() {
     const modal = document.getElementById('bookingModal');
-    if (modal) {
-        modal.classList.remove('active');
-    }
+    if (modal) modal.classList.remove('active');
 }
 
 // ==========================================
-// 6. LOAD SESSION TYPES
+// 7. LOAD SESSION TYPES
 // ==========================================
 function loadSessionTypes() {
     const typeSelect = document.getElementById('inputType');
@@ -241,41 +336,26 @@ function populateTypeOptions(selectElement, types) {
     });
 }
 
-// Helper: Normalize Date-Time string (YYYY-MM-DDTHH:MM)
+// Helper: Normalize Date-Time string
 function normalizeDateTime(dtStr) {
     if (!dtStr) return '';
     const d = new Date(dtStr);
     if (isNaN(d.getTime())) return dtStr;
     
     const pad = (num) => String(num).padStart(2, '0');
-    const year = d.getFullYear();
-    const month = pad(d.getMonth() + 1);
-    const day = pad(d.getDate());
-    const hours = pad(d.getHours());
-    const minutes = pad(d.getMinutes());
-
-    return `${year}-${month}-${day}T${hours}:${minutes}`;
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
 
-// Helper: Validate STRICT Algerian Phone Numbers
+// Helper: Validate Algerian Phone Numbers
 function isValidAlgerianPhone(phone) {
-    // ينظف الرقم من المسافات
     const cleanPhone = phone.replace(/\s+/g, '');
-    
-    // النمط يقبل:
-    // 1. الرقم المحلي الجزائري: يبدأ بـ 0 ويتبعه رقم من 5 إلى 7 ثم 8 أرقام أخرى (المجموع 10 أرقام) -> مثال: 05, 06, 07, 021 إلخ.
-    // 2. الرقم الدولي الجزائري: يبدأ بـ +213 أو 213 متبوعاً بـ 5, 6, 7 أو رموز الولايات ثم 8 أرقام.
     const dzPhoneRegex = /^(?:(?:\+|00)213|0)[1-9][0-9]{8}$/;
-    
     return dzPhoneRegex.test(cleanPhone);
 }
 
 // Helper: Send Telegram Notification
 async function sendTelegramNotification(booking) {
-    if (TELEGRAM_BOT_TOKEN === "YOUR_BOT_TOKEN" || TELEGRAM_CHAT_ID === "YOUR_CHAT_ID") {
-        console.warn("Telegram token or chat ID not configured.");
-        return;
-    }
+    if (TELEGRAM_BOT_TOKEN === "YOUR_BOT_TOKEN" || TELEGRAM_CHAT_ID === "YOUR_CHAT_ID") return;
 
     const message = `🚨 *حجز جديد في الاستوديو!*\n\n` +
                     `👤 *الاسم:* ${booking.name}\n` +
@@ -301,7 +381,7 @@ async function sendTelegramNotification(booking) {
 }
 
 // ==========================================
-// 7. HANDLE BOOKING FORM SUBMIT
+// 8. HANDLE BOOKING FORM SUBMIT
 // ==========================================
 async function handleFormSubmit(e) {
     e.preventDefault();
@@ -319,17 +399,12 @@ async function handleFormSubmit(e) {
     const datetime = normalizeDateTime(rawDatetime);
 
     if (!name || !phone || !type || !datetime) {
-        const msg = (currentLang === 'ar') ? "يرجى ملء جميع الحقول المطلوبة." : "Veuillez remplir tous les champs.";
-        alert(msg);
+        alert(currentLang === 'ar' ? "يرجى ملء جميع الحقول المطلوبة." : "Veuillez remplir tous les champs.");
         return;
     }
 
-    // Check if phone number is a valid Algerian phone number
     if (!isValidAlgerianPhone(phone)) {
-        const msgPhoneErr = (currentLang === 'ar') 
-            ? "رقم الهاتف غير جزائري أو غير صحيح! يرجى إدخال رقم هاتف جزائري حقيقي يتكون من 10 أرقام (مثال: 0550123456)." 
-            : "Numéro de téléphone algérien invalide ! Veuillez entrer un numéro valide à 10 chiffres (ex: 0550123456).";
-        alert(msgPhoneErr);
+        alert(currentLang === 'ar' ? "رقم الهاتف غير جزائري أو غير صحيح! (مثال: 0550123456)." : "Numéro de téléphone algérien invalide !");
         if (phoneInput) phoneInput.focus();
         return;
     }
@@ -337,33 +412,22 @@ async function handleFormSubmit(e) {
     if (submitBtn) submitBtn.disabled = true;
 
     try {
-        const msgConflict = (currentLang === 'ar') 
-            ? "هذا الموعد محجوز بالفعل! يرجى اختيار تاريخ أو وقت آخر." 
-            : "Ce créneau horaire est déjà réservé ! Veuillez choisir une autre date ou heure.";
+        const msgConflict = currentLang === 'ar' ? "هذا الموعد محجوز بالفعل!" : "Ce créneau horaire est déjà réservé !";
 
-        // 1. Check local storage for double booking
         const localBookings = JSON.parse(localStorage.getItem('admin_bookings') || '[]');
-        const isConflictLocal = localBookings.some(b => normalizeDateTime(b.datetime) === datetime);
-
-        if (isConflictLocal) {
+        if (localBookings.some(b => normalizeDateTime(b.datetime) === datetime)) {
             alert(msgConflict);
             if (submitBtn) submitBtn.disabled = false;
             return;
         }
 
-        // 2. Check Firestore database for double booking
         if (db) {
             try {
                 const snapshot = await db.collection('bookings').get();
                 let isConflictFirebase = false;
-
                 snapshot.forEach(doc => {
-                    const data = doc.data();
-                    if (normalizeDateTime(data.datetime) === datetime) {
-                        isConflictFirebase = true;
-                    }
+                    if (normalizeDateTime(doc.data().datetime) === datetime) isConflictFirebase = true;
                 });
-
                 if (isConflictFirebase) {
                     alert(msgConflict);
                     if (submitBtn) submitBtn.disabled = false;
@@ -374,35 +438,21 @@ async function handleFormSubmit(e) {
             }
         }
 
-        // 3. Save new booking
-        const newBooking = {
-            name: name,
-            phone: phone,
-            type: type,
-            datetime: datetime,
-            createdAt: new Date().toISOString()
-        };
-
+        const newBooking = { name, phone, type, datetime, createdAt: new Date().toISOString() };
         localBookings.push(newBooking);
         localStorage.setItem('admin_bookings', JSON.stringify(localBookings));
 
-        if (db) {
-            await db.collection('bookings').add(newBooking);
-        }
+        if (db) await db.collection('bookings').add(newBooking);
 
-        // 4. Send Telegram Notification instantly
         await sendTelegramNotification(newBooking);
 
-        const msgSuccess = (currentLang === 'ar') ? "تم الحجز بنجاح!" : "Réservation effectuée avec succès !";
-        alert(msgSuccess);
-        
+        alert(currentLang === 'ar' ? "تم الحجز بنجاح!" : "Réservation effectuée avec succès !");
         e.target.reset();
         closeModal();
 
     } catch (err) {
         console.error("Booking error:", err);
-        const msgErr = (currentLang === 'ar') ? "حدث خطأ، يرجى المحاولة مرة أخرى." : "Une erreur est survenue. Veuillez réessayer.";
-        alert(msgErr);
+        alert(currentLang === 'ar' ? "حدث خطأ، يرجى المحاولة مرة أخرى." : "Une erreur est survenue.");
     } finally {
         if (submitBtn) submitBtn.disabled = false;
     }
