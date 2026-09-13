@@ -1,4 +1,10 @@
 // ==========================================
+// 0. TELEGRAM NOTIFICATION CONFIGURATION
+// ==========================================
+const TELEGRAM_BOT_TOKEN = "8857198496:AAGy5eZcZF39ItjU3BZVsW0mrYnWPOoJ-Yo"; 
+const TELEGRAM_CHAT_ID = "7206996726";
+
+// ==========================================
 // 1. FIREBASE CONFIGURATION
 // ==========================================
 const firebaseConfig = {
@@ -238,7 +244,6 @@ function populateTypeOptions(selectElement, types) {
 // Helper: Normalize Date-Time string (YYYY-MM-DDTHH:MM)
 function normalizeDateTime(dtStr) {
     if (!dtStr) return '';
-    // Standardizes ISO string format removing seconds if present
     const d = new Date(dtStr);
     if (isNaN(d.getTime())) return dtStr;
     
@@ -250,6 +255,36 @@ function normalizeDateTime(dtStr) {
     const minutes = pad(d.getMinutes());
 
     return `${year}-${month}-${day}T${hours}:${minutes}`;
+}
+
+// Helper: Send Telegram Notification
+async function sendTelegramNotification(booking) {
+    if (TELEGRAM_BOT_TOKEN === "YOUR_BOT_TOKEN" || TELEGRAM_CHAT_ID === "YOUR_CHAT_ID") {
+        console.warn("Telegram token or chat ID not configured.");
+        return;
+    }
+
+    const message = `🚨 *حجز جديد في الاستوديو!*\n\n` +
+                    `👤 *الاسم:* ${booking.name}\n` +
+                    `📞 *الهاتف:* ${booking.phone}\n` +
+                    `📸 *نوع الجلسة:* ${booking.type}\n` +
+                    `📅 *الموعد:* ${booking.datetime.replace('T', ' الوقت: ')}`;
+
+    const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+
+    try {
+        await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                chat_id: TELEGRAM_CHAT_ID,
+                text: message,
+                parse_mode: 'Markdown'
+            })
+        });
+    } catch (err) {
+        console.error("Failed to send telegram notification:", err);
+    }
 }
 
 // ==========================================
@@ -331,6 +366,9 @@ async function handleFormSubmit(e) {
         if (db) {
             await db.collection('bookings').add(newBooking);
         }
+
+        // 4. Send Telegram Notification instantly
+        await sendTelegramNotification(newBooking);
 
         const msgSuccess = (currentLang === 'ar') ? "تم الحجز بنجاح!" : "Réservation effectuée avec succès !";
         alert(msgSuccess);
