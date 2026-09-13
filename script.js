@@ -2,7 +2,7 @@
 // 0. TELEGRAM NOTIFICATION CONFIGURATION
 // ==========================================
 const TELEGRAM_BOT_TOKEN = "8857198496:AAGy5eZcZF39ItjU3BZVsW0mrYnWPOoJ-Yo"; 
-const TELEGRAM_CHAT_ID = "7206996726";
+const TELEGRAM_CHAT_ID = "7206996726";     
 
 // ==========================================
 // 1. FIREBASE CONFIGURATION
@@ -257,6 +257,14 @@ function normalizeDateTime(dtStr) {
     return `${year}-${month}-${day}T${hours}:${minutes}`;
 }
 
+// Helper: Validate Real Phone Number Format
+function isValidPhone(phone) {
+    // يحذف المسافات ويتحقق أن الرقم يتكون فقط من أرقام (مع إمكانية بدءه بـ +) وبطول إجمالي بين 8 و 15 خانة
+    const cleanPhone = phone.replace(/\s+/g, '');
+    const phoneRegex = /^\+?[0-9]{8,15}$/;
+    return phoneRegex.test(cleanPhone);
+}
+
 // Helper: Send Telegram Notification
 async function sendTelegramNotification(booking) {
     if (TELEGRAM_BOT_TOKEN === "YOUR_BOT_TOKEN" || TELEGRAM_CHAT_ID === "YOUR_CHAT_ID") {
@@ -308,6 +316,16 @@ async function handleFormSubmit(e) {
     if (!name || !phone || !type || !datetime) {
         const msg = (currentLang === 'ar') ? "يرجى ملء جميع الحقول المطلوبة." : "Veuillez remplir tous les champs.";
         alert(msg);
+        return;
+    }
+
+    // Check if phone number is real and valid
+    if (!isValidPhone(phone)) {
+        const msgPhoneErr = (currentLang === 'ar') 
+            ? "رقم الهاتف غير صحيح! يرجى إدخال رقم هاتف حقيقي يتكون من أرقام صحيحة (8 أرقام على الأقل)." 
+            : "Numéro de téléphone invalide ! Veuillez entrer un vrai numéro (au moins 8 chiffres).";
+        alert(msgPhoneErr);
+        if (phoneInput) phoneInput.focus();
         return;
     }
 
