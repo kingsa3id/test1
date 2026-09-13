@@ -257,12 +257,17 @@ function normalizeDateTime(dtStr) {
     return `${year}-${month}-${day}T${hours}:${minutes}`;
 }
 
-// Helper: Validate Real Phone Number Format
-function isValidPhone(phone) {
-    // يحذف المسافات ويتحقق أن الرقم يتكون فقط من أرقام (مع إمكانية بدءه بـ +) وبطول إجمالي بين 8 و 15 خانة
+// Helper: Validate STRICT Algerian Phone Numbers
+function isValidAlgerianPhone(phone) {
+    // ينظف الرقم من المسافات
     const cleanPhone = phone.replace(/\s+/g, '');
-    const phoneRegex = /^\+?[0-9]{8,15}$/;
-    return phoneRegex.test(cleanPhone);
+    
+    // النمط يقبل:
+    // 1. الرقم المحلي الجزائري: يبدأ بـ 0 ويتبعه رقم من 5 إلى 7 ثم 8 أرقام أخرى (المجموع 10 أرقام) -> مثال: 05, 06, 07, 021 إلخ.
+    // 2. الرقم الدولي الجزائري: يبدأ بـ +213 أو 213 متبوعاً بـ 5, 6, 7 أو رموز الولايات ثم 8 أرقام.
+    const dzPhoneRegex = /^(?:(?:\+|00)213|0)[1-9][0-9]{8}$/;
+    
+    return dzPhoneRegex.test(cleanPhone);
 }
 
 // Helper: Send Telegram Notification
@@ -319,11 +324,11 @@ async function handleFormSubmit(e) {
         return;
     }
 
-    // Check if phone number is real and valid
-    if (!isValidPhone(phone)) {
+    // Check if phone number is a valid Algerian phone number
+    if (!isValidAlgerianPhone(phone)) {
         const msgPhoneErr = (currentLang === 'ar') 
-            ? "رقم الهاتف غير صحيح! يرجى إدخال رقم هاتف حقيقي يتكون من أرقام صحيحة (8 أرقام على الأقل)." 
-            : "Numéro de téléphone invalide ! Veuillez entrer un vrai numéro (au moins 8 chiffres).";
+            ? "رقم الهاتف غير جزائري أو غير صحيح! يرجى إدخال رقم هاتف جزائري حقيقي يتكون من 10 أرقام (مثال: 0550123456)." 
+            : "Numéro de téléphone algérien invalide ! Veuillez entrer un numéro valide à 10 chiffres (ex: 0550123456).";
         alert(msgPhoneErr);
         if (phoneInput) phoneInput.focus();
         return;
