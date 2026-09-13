@@ -1,19 +1,3 @@
-// Immediate Security Guard (Runs before DOM renders)
-(function enforceAuthGuard() {
-    const isLoginPage = window.location.pathname.endsWith('login.html');
-    const isDashboard = window.location.pathname.endsWith('admin-dashboard.html');
-    const currentAdmin = sessionStorage.getItem('current_admin');
-
-    // 1. If trying to view dashboard without being logged in -> Kick to login.html
-    if (isDashboard && !currentAdmin) {
-        window.location.replace('login.html');
-    }
-
-    // 2. If already logged in and trying to view login page -> Redirect to dashboard
-    if (isLoginPage && currentAdmin) {
-        window.location.replace('admin-dashboard.html');
-    }
-})();
 const firebaseConfig = {
     apiKey: "AIzaSyD0uoLQDS40S8Am8WYdLOfFxEsQuhqQPLQ",
     authDomain: "photoshop-e8266.firebaseapp.com",
@@ -51,17 +35,17 @@ function handleLogin(e) {
 
     if (match) {
         sessionStorage.setItem('current_admin', JSON.stringify({ email: match.email }));
-        window.location.href = 'admin-dashboard.html';
+        window.location.replace('dashboard.html');
     } else {
         if (errorElement) errorElement.style.display = 'block';
     }
 }
 
-// Security Shield Protect Dashboard
+// Protection Guard for Dashboard
 function protectPage() {
     const currentAdmin = sessionStorage.getItem('current_admin');
     if (!currentAdmin) {
-        window.location.href = 'login.html';
+        window.location.replace('index.html');
         return;
     }
     const user = JSON.parse(currentAdmin);
@@ -121,7 +105,7 @@ function deleteAdmin(email) {
     renderAdminList();
 }
 
-// Add New Session Type (Dual sync: LocalStorage + Firestore)
+// Add New Session Type
 function handleAddSessionType(e) {
     e.preventDefault();
     const fr = document.getElementById('typeFr').value.trim();
@@ -249,5 +233,5 @@ function loadLocalBookings(container) {
 // Logout
 function logoutAdmin() {
     sessionStorage.removeItem('current_admin');
-    window.location.href = 'login.html';
+    window.location.replace('index.html');
 }
