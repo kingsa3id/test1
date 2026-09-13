@@ -1,8 +1,20 @@
 // ==========================================
-// 0. TELEGRAM NOTIFICATION CONFIGURATION
+// 0. TELEGRAM & SITE CONFIGURATION
 // ==========================================
 const TELEGRAM_BOT_TOKEN = "8857198496:AAGy5eZcZF39ItjU3BZVsW0mrYnWPOoJ-Yo"; 
 const TELEGRAM_CHAT_ID = "7206996726";     
+
+const defaultSettings = {
+    mainPhone: "0550123456",
+    whatsapp: "https://wa.me/213550000000",
+    instagram: "https://instagram.com/",
+    telegram: "https://t.me/"
+};
+
+function getSiteSettings() {
+    const saved = localStorage.getItem('site_settings');
+    return saved ? JSON.parse(saved) : defaultSettings;
+}
 
 // ==========================================
 // 1. FIREBASE CONFIGURATION
@@ -98,6 +110,9 @@ let currentLang = localStorage.getItem('site_lang') || 'fr';
 document.addEventListener('DOMContentLoaded', () => {
     applyLanguage(currentLang);
     loadSessionTypes();
+    renderFloatingBubbles();
+    injectAdminModalHTML();
+    setupAdminModalEvents();
 
     const langBtn = document.getElementById('langToggle');
     if (langBtn) {
@@ -125,6 +140,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.target === modal) {
             closeModal();
         }
+        const adminModal = document.getElementById('adminModal');
+        if (e.target === adminModal) {
+            closeAdminModal();
+        }
     });
 
     const bookingForm = document.getElementById('bookingForm');
@@ -143,7 +162,121 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // ==========================================
-// 4. LANGUAGE TOGGLE FUNCTION
+// 4. FLOATING BUBBLES & ADMIN MODAL INJECTION
+// ==========================================
+function renderFloatingBubbles() {
+    let container = document.getElementById('floatingBubbles');
+    if (!container) {
+        container = document.createElement('div');
+        container.id = 'floatingBubbles';
+        container.className = 'fixed bottom-6 left-6 z-50 flex flex-col gap-3';
+        document.body.appendChild(container);
+    }
+
+    const settings = getSiteSettings();
+    container.innerHTML = '';
+
+    if (settings.whatsapp) {
+        container.innerHTML += `
+            <a href="${settings.whatsapp}" target="_blank" class="w-12 h-12 bg-green-600 text-white rounded-full flex items-center justify-center text-xl shadow-lg hover:scale-110 transition" title="WhatsApp">
+                <i class="fa-brands fa-whatsapp"></i>
+            </a>
+        `;
+    }
+
+    if (settings.instagram) {
+        container.innerHTML += `
+            <a href="${settings.instagram}" target="_blank" class="w-12 h-12 bg-pink-600 text-white rounded-full flex items-center justify-center text-xl shadow-lg hover:scale-110 transition" title="Instagram">
+                <i class="fa-brands fa-instagram"></i>
+            </a>
+        `;
+    }
+
+    if (settings.mainPhone) {
+        container.innerHTML += `
+            <a href="tel:${settings.mainPhone}" class="w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center text-xl shadow-lg hover:scale-110 transition" title="Call Us">
+                <i class="fa-solid fa-phone"></i>
+            </a>
+        `;
+    }
+}
+
+function injectAdminModalHTML() {
+    if (document.getElementById('adminModal')) return;
+
+    const modalHTML = `
+    <div id="adminModal" class="fixed inset-0 bg-black/70 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-zinc-900 text-white w-full max-w-lg rounded-2xl p-6 border border-zinc-700 shadow-2xl relative">
+            <button id="closeAdminBtn" class="absolute top-4 left-4 text-zinc-400 hover:text-white text-xl">&times;</button>
+            <h3 class="text-xl font-bold mb-4 text-accent">لوحة تحكم الإعدادات (Admin Panel)</h3>
+            
+            <form id="adminSettingsForm" class="space-y-4">
+                <div>
+                    <label class="block text-sm mb-1">رقم الهاتف الأساسي للاستوديو:</label>
+                    <input type="text" id="adminMainPhone" class="w-full bg-zinc-800 border border-zinc-700 rounded-lg p-2.5 text-white" placeholder="0550123456">
+                </div>
+                <div>
+                    <label class="block text-sm mb-1">رابط واتساب (WhatsApp Link):</label>
+                    <input type="text" id="adminWhatsapp" class="w-full bg-zinc-800 border border-zinc-700 rounded-lg p-2.5 text-white" placeholder="https://wa.me/213550000000">
+                </div>
+                <div>
+                    <label class="block text-sm mb-1">رابط انستغرام (Instagram Link):</label>
+                    <input type="text" id="adminInstagram" class="w-full bg-zinc-800 border border-zinc-700 rounded-lg p-2.5 text-white" placeholder="https://instagram.com/yourstudio">
+                </div>
+                <div>
+                    <label class="block text-sm mb-1">رابط تيليجرام (Telegram Link):</label>
+                    <input type="text" id="adminTelegram" class="w-full bg-zinc-800 border border-zinc-700 rounded-lg p-2.5 text-white" placeholder="https://t.me/yourusername">
+                </div>
+                <button type="submit" class="w-full bg-accent text-zinc-950 font-bold py-3 rounded-lg hover:opacity-95 transition">حفظ التغييرات</button>
+            </form>
+        </div>
+    </div>`;
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+}
+
+function openAdminModal() {
+    const modal = document.getElementById('adminModal');
+    if (!modal) return;
+    
+    const settings = getSiteSettings();
+    document.getElementById('adminMainPhone').value = settings.mainPhone || '';
+    document.getElementById('adminWhatsapp').value = settings.whatsapp || '';
+    document.getElementById('adminInstagram').value = settings.instagram || '';
+    document.getElementById('adminTelegram').value = settings.telegram || '';
+
+    modal.classList.remove('hidden');
+}
+
+function closeAdminModal() {
+    const modal = document.getElementById('adminModal');
+    if (modal) modal.classList.add('hidden');
+}
+
+function setupAdminModalEvents() {
+    const closeBtn = document.getElementById('closeAdminBtn');
+    if (closeBtn) closeBtn.addEventListener('click', closeAdminModal);
+
+    const form = document.getElementById('adminSettingsForm');
+    if (form) {
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const newSettings = {
+                mainPhone: document.getElementById('adminMainPhone').value.trim(),
+                whatsapp: document.getElementById('adminWhatsapp').value.trim(),
+                instagram: document.getElementById('adminInstagram').value.trim(),
+                telegram: document.getElementById('adminTelegram').value.trim()
+            };
+
+            localStorage.setItem('site_settings', JSON.stringify(newSettings));
+            renderFloatingBubbles();
+            closeAdminModal();
+            alert("تم حفظ إعدادات الموقع وتحديث الفقاعات العائمة بنجاح!");
+        });
+    }
+}
+
+// ==========================================
+// 5. LANGUAGE TOGGLE FUNCTION
 // ==========================================
 function toggleLanguage() {
     currentLang = (currentLang === 'fr') ? 'ar' : 'fr';
@@ -176,7 +309,7 @@ function applyLanguage(lang) {
 }
 
 // ==========================================
-// 5. MODAL CONTROL
+// 6. MODAL CONTROL
 // ==========================================
 function openModal() {
     const modal = document.getElementById('bookingModal');
@@ -193,7 +326,7 @@ function closeModal() {
 }
 
 // ==========================================
-// 6. LOAD SESSION TYPES
+// 7. LOAD SESSION TYPES
 // ==========================================
 function loadSessionTypes() {
     const typeSelect = document.getElementById('inputType');
@@ -212,8 +345,8 @@ function loadSessionTypes() {
                 snapshot.docs.forEach(doc => {
                     const data = doc.data();
                     fetched.push({
-                        fr: data.fr || data.nameFr || '',
-                        ar: data.ar || data.nameAr || ''
+                        fr: data.fr || data.nameFr || data.name || '',
+                        ar: data.ar || data.nameAr || data.name || ''
                     });
                 });
                 populateTypeOptions(typeSelect, fetched);
@@ -233,11 +366,26 @@ function populateLocalTypes(selectElement, fallbackTypes) {
 
 function populateTypeOptions(selectElement, types) {
     selectElement.innerHTML = `<option value="">-- ${currentLang === 'ar' ? 'اختر نوع الجلسة' : 'Choisissez un type de séance'} --</option>`;
+    
+    if (!Array.isArray(types)) return;
+
     types.forEach(item => {
         const option = document.createElement('option');
-        option.value = item.fr;
-        option.textContent = (currentLang === 'ar' && item.ar) ? item.ar : item.fr;
-        selectElement.appendChild(option);
+        
+        if (typeof item === 'string') {
+            option.value = item;
+            option.textContent = item;
+        } else if (typeof item === 'object' && item !== null) {
+            const val = item.fr || item.name || item.title || item.ar || '';
+            const txt = (currentLang === 'ar' && (item.ar || item.name || item.title)) ? (item.ar || item.name || item.title) : val;
+            
+            option.value = val;
+            option.textContent = txt;
+        }
+
+        if (option.value) {
+            selectElement.appendChild(option);
+        }
     });
 }
 
@@ -259,29 +407,25 @@ function normalizeDateTime(dtStr) {
 
 // Helper: Validate STRICT Algerian Phone Numbers
 function isValidAlgerianPhone(phone) {
-    // ينظف الرقم من المسافات
     const cleanPhone = phone.replace(/\s+/g, '');
-    
-    // النمط يقبل:
-    // 1. الرقم المحلي الجزائري: يبدأ بـ 0 ويتبعه رقم من 5 إلى 7 ثم 8 أرقام أخرى (المجموع 10 أرقام) -> مثال: 05, 06, 07, 021 إلخ.
-    // 2. الرقم الدولي الجزائري: يبدأ بـ +213 أو 213 متبوعاً بـ 5, 6, 7 أو رموز الولايات ثم 8 أرقام.
     const dzPhoneRegex = /^(?:(?:\+|00)213|0)[1-9][0-9]{8}$/;
-    
     return dzPhoneRegex.test(cleanPhone);
 }
 
-// Helper: Send Telegram Notification
+// Helper: Send Telegram Notification (HTML Mode)
 async function sendTelegramNotification(booking) {
     if (TELEGRAM_BOT_TOKEN === "YOUR_BOT_TOKEN" || TELEGRAM_CHAT_ID === "YOUR_CHAT_ID") {
         console.warn("Telegram token or chat ID not configured.");
         return;
     }
 
-    const message = `🚨 *حجز جديد في الاستوديو!*\n\n` +
-                    `👤 *الاسم:* ${booking.name}\n` +
-                    `📞 *الهاتف:* ${booking.phone}\n` +
-                    `📸 *نوع الجلسة:* ${booking.type}\n` +
-                    `📅 *الموعد:* ${booking.datetime.replace('T', ' الوقت: ')}`;
+    const escapeHTML = (str) => String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+    const message = `🚨 <b>حجز جديد في الاستوديو!</b>\n\n` +
+                    `👤 <b>الاسم:</b> ${escapeHTML(booking.name)}\n` +
+                    `📞 <b>الهاتف:</b> ${escapeHTML(booking.phone)}\n` +
+                    `📸 <b>نوع الجلسة:</b> ${escapeHTML(booking.type)}\n` +
+                    `📅 <b>الموعد:</b> ${escapeHTML(booking.datetime.replace('T', ' الوقت: '))}`;
 
     const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
 
@@ -292,7 +436,7 @@ async function sendTelegramNotification(booking) {
             body: JSON.stringify({
                 chat_id: TELEGRAM_CHAT_ID,
                 text: message,
-                parse_mode: 'Markdown'
+                parse_mode: 'HTML'
             })
         });
     } catch (err) {
@@ -301,7 +445,7 @@ async function sendTelegramNotification(booking) {
 }
 
 // ==========================================
-// 7. HANDLE BOOKING FORM SUBMIT
+// 8. HANDLE BOOKING FORM SUBMIT
 // ==========================================
 async function handleFormSubmit(e) {
     e.preventDefault();
@@ -324,7 +468,6 @@ async function handleFormSubmit(e) {
         return;
     }
 
-    // Check if phone number is a valid Algerian phone number
     if (!isValidAlgerianPhone(phone)) {
         const msgPhoneErr = (currentLang === 'ar') 
             ? "رقم الهاتف غير جزائري أو غير صحيح! يرجى إدخال رقم هاتف جزائري حقيقي يتكون من 10 أرقام (مثال: 0550123456)." 
@@ -390,7 +533,7 @@ async function handleFormSubmit(e) {
             await db.collection('bookings').add(newBooking);
         }
 
-        // 4. Send Telegram Notification instantly
+        // 4. Send Telegram Notification
         await sendTelegramNotification(newBooking);
 
         const msgSuccess = (currentLang === 'ar') ? "تم الحجز بنجاح!" : "Réservation effectuée avec succès !";
