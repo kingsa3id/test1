@@ -23,100 +23,141 @@ try {
         }
     }
 } catch (err) {
-    console.warn("Firebase mode fallback:", err);
+    console.warn("Firebase fallback:", err);
 }
 
 // ==========================================
-// 2. INITIALIZATION & UI EVENTS
+// 2. DICTIONARY FOR TRANSLATION (FR / AR)
+// ==========================================
+const translations = {
+    fr: {
+        navGallery: "Galerie",
+        navAbout: "À Propos",
+        navContact: "Contact",
+        langBtnText: "العربية",
+        heroTagline: "STUDIO DE PHOTOGRAPHIE HAUT DE GAMME",
+        heroTitle: 'Saisir Des Moments <br><span class="text-accent">Intemporels</span>',
+        heroDesc: "Photographie d'art pour mariages, portraits de prestige et événements.",
+        btnBook: "Réserver une séance",
+        btnCall: "Appeler maintenant",
+        galleryTitle: "Travaux Récents",
+        aboutSub: "À PROPOS DE NOUS",
+        aboutTitle: "Capturer L'Émotion Avec Passion & Précision",
+        aboutDesc1: "Fondé sur une passion pour l'art visuel et le storytelling, notre studio s'efforce de capturer la véritable essence de vos moments les plus précieux. Nous croyons que chaque photographie doit raconter une histoire intemporelle.",
+        aboutDesc2: "Que ce soit pour votre mariage, un portrait professionnel ou un événement d'exception, nous combinons une approche artistique raffinée avec des équipements de pointe pour vous offrir une qualité irréprochable.",
+        feat1: '<i class="fa-solid fa-camera"></i> Matériel Professionnel High-End',
+        feat2: '<i class="fa-solid fa-wand-magic-sparkles"></i> Retouche Artistique Soignée',
+        modalTitle: "Réserver une séance photo",
+        modalDesc: "Complétez le formulaire ci-dessous pour réserver votre date.",
+        lblNama: "Nom complet",
+        lblPhone: "Numéro de téléphone",
+        lblType: "Type de séance",
+        lblDateTime: "Date et Heure de la séance",
+        btnSubmit: "Confirmer la réservation",
+        footerCopy: "© 2026 LENS & ART. Tous droits réservés."
+    },
+    ar: {
+        navGallery: "المعرض",
+        navAbout: "من نحن",
+        navContact: "اتصل بنا",
+        langBtnText: "Français",
+        heroTagline: "استوديو تصوير فوتوغرافي فاخر",
+        heroTitle: 'تخليد اللحظات <br><span class="text-accent">الأبدية</span>',
+        heroDesc: "تصوير فني احترافي للأعراس، البورتريه، والمناسبات الخاصة.",
+        btnBook: "حجز جلسة تصوير",
+        btnCall: "اتصل بنا الآن",
+        galleryTitle: "أحدث الأعمال",
+        aboutSub: "من نحن",
+        aboutTitle: "نلتقط المشاعر بشغف ودقة",
+        aboutDesc1: "تأسس استوديونا على الشغف بالفن البصري وسرد القصص، ونسعى لجعل كل صورة تحفة فنية تحافظ على جمال أثمن لحظاتكم.",
+        aboutDesc2: "سواء كان لحفل زفافك، أو جلسة بورتريه احترافية، ندمج بين الرؤية الفنية والتقنيات الحديثة لنضمن لك جودة استثنائية.",
+        feat1: '<i class="fa-solid fa-camera"></i> معدات تصوير عالمية واحترافية',
+        feat2: '<i class="fa-solid fa-wand-magic-sparkles"></i> تعديل ومعالجة فنية دقيقة',
+        modalTitle: "حجز جلسة تصوير",
+        modalDesc: "يرجى ملء الاستمارة أدناه لتأكيد حجز موعدك.",
+        lblNama: "الاسم الكامل",
+        lblPhone: "رقم الهاتف",
+        lblType: "نوع الجلسة",
+        lblDateTime: "تاريخ ووقت الجلسة",
+        btnSubmit: "تأكيد الحجز",
+        footerCopy: "© 2026 LENS & ART. جميع الحقوق محفوظة."
+    }
+};
+
+let currentLang = localStorage.getItem('site_lang') || 'fr';
+
+// ==========================================
+// 3. INITIALIZATION
 // ==========================================
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. Initialize Language System
-    initLanguageSystem();
-
-    // 2. Load Session Types into Dropdown
+    applyLanguage(currentLang);
     loadSessionTypes();
-
-    // 3. Setup Booking Buttons & Smooth Scrolling
-    setupBookingButtons();
-
-    // 4. Attach Form Submit Listener
-    const bookingForm = document.getElementById('bookingForm');
-    if (bookingForm) {
-        bookingForm.addEventListener('submit', handleBookingSubmit);
-    }
 });
 
 // ==========================================
-// 3. LANGUAGE SWITCHER SYSTEM (AR / FR)
+// 4. LANGUAGE TOGGLE FUNCTION
 // ==========================================
-let currentLang = localStorage.getItem('site_lang') || 'fr';
-
-function initLanguageSystem() {
+function toggleLanguage() {
+    currentLang = (currentLang === 'fr') ? 'ar' : 'fr';
+    localStorage.setItem('site_lang', currentLang);
     applyLanguage(currentLang);
-
-    // Find language toggle button by ID or Class
-    const langBtn = document.getElementById('langToggle') || document.querySelector('.lang-btn');
-    if (langBtn) {
-        langBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            currentLang = (currentLang === 'fr') ? 'ar' : 'fr';
-            localStorage.setItem('site_lang', currentLang);
-            applyLanguage(currentLang);
-        });
-    }
+    loadSessionTypes();
 }
 
 function applyLanguage(lang) {
     document.documentElement.lang = lang;
     document.documentElement.dir = (lang === 'ar') ? 'rtl' : 'ltr';
 
-    // Translate elements with data-fr and data-ar attributes
-    document.querySelectorAll('[data-fr][data-ar]').forEach(el => {
-        const text = el.getAttribute(`data-${lang}`);
-        if (text) {
-            if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
-                el.placeholder = text;
+    const t = translations[lang];
+
+    for (const key in t) {
+        const el = document.getElementById(key);
+        if (el) {
+            if (key === 'heroTitle' || key === 'feat1' || key === 'feat2') {
+                el.innerHTML = t[key];
             } else {
-                el.textContent = text;
+                el.textContent = t[key];
             }
         }
-    });
+    }
 
-    // Update Language Button Text if exists
-    const langBtn = document.getElementById('langToggle') || document.querySelector('.lang-btn');
+    // Update Language Button Text
+    const langBtn = document.getElementById('langToggle');
     if (langBtn) {
-        langBtn.textContent = (lang === 'fr') ? 'العربية' : 'Français';
+        langBtn.innerHTML = `<i class="fa-solid fa-globe"></i> <span>${t.langBtnText}</span>`;
     }
 }
 
 // ==========================================
-// 4. BOOKING BUTTONS & NAVIGATION
+// 5. MODAL CONTROL (OPEN / CLOSE)
 // ==========================================
-function setupBookingButtons() {
-    // Scroll smoothly to booking section when clicking reserve buttons
-    document.querySelectorAll('a[href^="#"], .btn-book, .btn-reserve').forEach(btn => {
-        btn.addEventListener('click', function (e) {
-            const href = this.getAttribute('href');
-            let targetId = href;
-
-            if (!targetId || targetId === '#') {
-                targetId = '#booking';
-            }
-
-            const targetEl = document.querySelector(targetId) || document.getElementById('bookingForm');
-            if (targetEl) {
-                e.preventDefault();
-                targetEl.scrollIntoView({ behavior: 'smooth' });
-            }
-        });
-    });
+function openModal() {
+    const modal = document.getElementById('bookingModal');
+    if (modal) {
+        modal.classList.add('active');
+    }
 }
 
+function closeModal() {
+    const modal = document.getElementById('bookingModal');
+    if (modal) {
+        modal.classList.remove('active');
+    }
+}
+
+// Close Modal when clicking outside
+window.addEventListener('click', (e) => {
+    const modal = document.getElementById('bookingModal');
+    if (e.target === modal) {
+        closeModal();
+    }
+});
+
 // ==========================================
-// 5. LOAD SESSION TYPES
+// 6. LOAD SESSION TYPES
 // ==========================================
 function loadSessionTypes() {
-    const typeSelect = document.getElementById('bookingType');
+    const typeSelect = document.getElementById('inputType');
     if (!typeSelect) return;
 
     const defaultTypes = [
@@ -162,17 +203,16 @@ function populateTypeOptions(selectElement, types) {
 }
 
 // ==========================================
-// 6. SUBMIT & DOUBLE-BOOKING PREVENTION
+// 7. HANDLE BOOKING FORM SUBMIT
 // ==========================================
-async function handleBookingSubmit(e) {
+async function handleFormSubmit(e) {
     e.preventDefault();
 
-    const submitBtn = e.target.querySelector('button[type="submit"]');
-
-    const nameInput = document.getElementById('bookingName');
-    const phoneInput = document.getElementById('bookingPhone');
-    const typeInput = document.getElementById('bookingType');
-    const dateTimeInput = document.getElementById('bookingDateTime');
+    const submitBtn = document.getElementById('btnSubmit');
+    const nameInput = document.getElementById('inputName');
+    const phoneInput = document.getElementById('inputPhone');
+    const typeInput = document.getElementById('inputType');
+    const dateTimeInput = document.getElementById('inputDateTime');
 
     const name = nameInput ? nameInput.value.trim() : '';
     const phone = phoneInput ? phoneInput.value.trim() : '';
@@ -180,7 +220,7 @@ async function handleBookingSubmit(e) {
     const datetime = dateTimeInput ? dateTimeInput.value : '';
 
     if (!name || !phone || !type || !datetime) {
-        const msg = (currentLang === 'ar') ? "يرجى ملء جميع الحقول المطلوبة." : "Veuillez remplir tous les champs obligatoires.";
+        const msg = (currentLang === 'ar') ? "يرجى ملء جميع الحقول المطلوبة." : "Veuillez remplir tous les champs.";
         alert(msg);
         return;
     }
@@ -188,7 +228,7 @@ async function handleBookingSubmit(e) {
     if (submitBtn) submitBtn.disabled = true;
 
     try {
-        // 1. Check LocalStorage for time conflict
+        // 1. Check local storage for double booking
         const localBookings = JSON.parse(localStorage.getItem('admin_bookings') || '[]');
         const isConflictLocal = localBookings.some(b => b.datetime === datetime);
 
@@ -201,7 +241,7 @@ async function handleBookingSubmit(e) {
             return;
         }
 
-        // 2. Check Firebase Firestore for time conflict
+        // 2. Check Firestore database for double booking
         if (db) {
             try {
                 const snapshot = await db.collection('bookings').where('datetime', '==', datetime).get();
@@ -218,7 +258,7 @@ async function handleBookingSubmit(e) {
             }
         }
 
-        // 3. Save new booking if available
+        // 3. Save new booking
         const newBooking = {
             name: name,
             phone: phone,
@@ -236,7 +276,9 @@ async function handleBookingSubmit(e) {
 
         const msgSuccess = (currentLang === 'ar') ? "تم الحجز بنجاح!" : "Réservation effectuée avec succès !";
         alert(msgSuccess);
+        
         e.target.reset();
+        closeModal();
 
     } catch (err) {
         console.error("Booking error:", err);
