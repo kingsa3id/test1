@@ -1,3 +1,19 @@
+// Immediate Security Guard (Runs before DOM renders)
+(function enforceAuthGuard() {
+    const isLoginPage = window.location.pathname.endsWith('login.html');
+    const isDashboard = window.location.pathname.endsWith('admin-dashboard.html');
+    const currentAdmin = sessionStorage.getItem('current_admin');
+
+    // 1. If trying to view dashboard without being logged in -> Kick to login.html
+    if (isDashboard && !currentAdmin) {
+        window.location.replace('login.html');
+    }
+
+    // 2. If already logged in and trying to view login page -> Redirect to dashboard
+    if (isLoginPage && currentAdmin) {
+        window.location.replace('admin-dashboard.html');
+    }
+})();
 const firebaseConfig = {
     apiKey: "AIzaSyD0uoLQDS40S8Am8WYdLOfFxEsQuhqQPLQ",
     authDomain: "photoshop-e8266.firebaseapp.com",
