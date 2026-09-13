@@ -654,3 +654,49 @@ footer {
         left: 20px;
     }
 }
+
+/* ==========================================
+   تحسينات المظهر والجاذبية للهواتف الذكية (Mobile UX)
+   ========================================== */
+
+@media (max-width: 768px) {
+    /* 1. منع نظام آبل (iOS) من التكبير التلقائي المزعج عند التركيز على الحقول */
+    input, select, textarea {
+        font-size: 16px !important;
+    }
+
+    /* 2. تحسين تصميم النوافذ المنبثقة (Modals) لتلائم الشاشات الصغيرة مع التمرير السلس */
+    #bookingModal > div, 
+    #adminModal > div {
+        width: 92% !important;
+        max-height: 85vh !important;
+        overflow-y: auto !important;
+        margin: 1rem auto !important;
+        padding: 1.25rem !important;
+        border-radius: 1rem !important;
+    }
+
+    /* 3. تصغير وتعديل مواقع الفقاعات العائمة لكي لا تحجب المحتوى المهم */
+    #floatingBubbles {
+        bottom: 1rem !important;
+        left: 1rem !important;
+        gap: 0.5rem !important;
+    }
+    
+    #floatingBubbles a {
+        width: 2.75rem !important;
+        height: 2.75rem !important;
+        font-size: 1.1rem !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
+    }
+
+    /* 4. ضبط العناوين الرئيسية لتتلاءم مع عرض الشاشة بدون خروج النصوص */
+    h1, h2 {
+        word-break: break-word;
+    }
+
+    /* 5. زيادة مساحات اللمس للأزرار لتكون مريحة للإصبع */
+    button, input[type="submit"], .btn-touch {
+        min-height: 44px;
+    }
+}
