@@ -182,7 +182,7 @@ function deleteSessionType(index, firestoreId) {
     renderAdminSessionTypes();
 }
 
-// Render Bookings List
+// Render Bookings List with Delete button
 function renderBookings() {
     const listContainer = document.getElementById('bookingList');
     if (!listContainer) return;
@@ -191,14 +191,16 @@ function renderBookings() {
         db.collection('bookings').onSnapshot(snapshot => {
             if (snapshot && !snapshot.empty) {
                 listContainer.innerHTML = '';
-                snapshot.docs.forEach(doc => {
+                snapshot.docs.forEach((doc, index) => {
                     const b = doc.data();
                     const li = document.createElement('li');
+                    li.style.cssText = 'display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;';
                     li.innerHTML = `
                         <div>
                             <strong>${b.name}</strong> (${b.phone})<br>
                             <small style="color:#aaa;">Type: ${b.type} | Date: ${b.datetime}</small>
                         </div>
+                        <button class="btn-danger" onclick="deleteBooking('${doc.id}', ${index})">Supprimer</button>
                     `;
                     listContainer.appendChild(li);
                 });
@@ -218,16 +220,40 @@ function loadLocalBookings(container) {
         container.innerHTML = '<li style="color:#888;">Aucune réservation pour le moment.</li>';
         return;
     }
-    localBookings.forEach(b => {
+    localBookings.forEach((b, index) => {
         const li = document.createElement('li');
+        li.style.cssText = 'display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;';
         li.innerHTML = `
             <div>
                 <strong>${b.name}</strong> (${b.phone})<br>
                 <small style="color:#aaa;">Type: ${b.type} | Date: ${b.datetime}</small>
             </div>
+            <button class="btn-danger" onclick="deleteBooking(null, ${index})">Supprimer</button>
         `;
         container.appendChild(li);
     });
+}
+
+// Delete Booking Function
+function deleteBooking(firestoreId, index) {
+    if (!confirm("Voulez-vous vraiment supprimer cette réservation ?")) return;
+
+    // Remove from LocalStorage
+    let localBookings = JSON.parse(localStorage.getItem('admin_bookings') || '[]');
+    if (index !== null && index !== undefined && index < localBookings.length) {
+        localBookings.splice(index, 1);
+        localStorage.setItem('admin_bookings', JSON.stringify(localBookings));
+    }
+
+    // Remove from Firestore
+    if (db && firestoreId && firestoreId !== 'null') {
+        db.collection('bookings').doc(firestoreId).delete()
+          .then(() => alert("Réservation supprimée !"))
+          .catch(err => console.error("Erreur de suppression:", err));
+    } else {
+        alert("Réservation supprimée !");
+        renderBookings();
+    }
 }
 
 // Logout
