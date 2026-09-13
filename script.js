@@ -90,11 +90,9 @@ let currentLang = localStorage.getItem('site_lang') || 'fr';
 // 3. INITIALIZATION & EVENT LISTENERS
 // ==========================================
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. Initialize Language & Types
     applyLanguage(currentLang);
     loadSessionTypes();
 
-    // 2. Language Button Event Listener
     const langBtn = document.getElementById('langToggle');
     if (langBtn) {
         langBtn.addEventListener('click', (e) => {
@@ -103,7 +101,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 3. Open Modal Event Listener
     const btnBook = document.getElementById('btnBook');
     if (btnBook) {
         btnBook.addEventListener('click', (e) => {
@@ -112,7 +109,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 4. Close Modal Event Listener
     const closeModalBtn = document.getElementById('closeModalBtn');
     if (closeModalBtn) {
         closeModalBtn.addEventListener('click', closeModal);
@@ -125,13 +121,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // 5. Form Submit Listener
     const bookingForm = document.getElementById('bookingForm');
     if (bookingForm) {
         bookingForm.addEventListener('submit', handleFormSubmit);
     }
 
-    // 6. Picker for DateTime Input
     const dtInput = document.getElementById('inputDateTime');
     if (dtInput) {
         dtInput.addEventListener('click', () => {
@@ -241,6 +235,23 @@ function populateTypeOptions(selectElement, types) {
     });
 }
 
+// Helper: Normalize Date-Time string (YYYY-MM-DDTHH:MM)
+function normalizeDateTime(dtStr) {
+    if (!dtStr) return '';
+    // Standardizes ISO string format removing seconds if present
+    const d = new Date(dtStr);
+    if (isNaN(d.getTime())) return dtStr;
+    
+    const pad = (num) => String(num).padStart(2, '0');
+    const year = d.getFullYear();
+    const month = pad(d.getMonth() + 1);
+    const day = pad(d.getDate());
+    const hours = pad(d.getHours());
+    const minutes = pad(d.getMinutes());
+
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+}
+
 // ==========================================
 // 7. HANDLE BOOKING FORM SUBMIT
 // ==========================================
@@ -256,7 +267,8 @@ async function handleFormSubmit(e) {
     const name = nameInput ? nameInput.value.trim() : '';
     const phone = phoneInput ? phoneInput.value.trim() : '';
     const type = typeInput ? typeInput.value : '';
-    const datetime = dateTimeInput ? dateTimeInput.value : '';
+    const rawDatetime = dateTimeInput ? dateTimeInput.value : '';
+    const datetime = normalizeDateTime(rawDatetime);
 
     if (!name || !phone || !type || !datetime) {
         const msg = (currentLang === 'ar') ? "يرجى ملء جميع الحقول المطلوبة." : "Veuillez remplir tous les champs.";
@@ -267,14 +279,15 @@ async function handleFormSubmit(e) {
     if (submitBtn) submitBtn.disabled = true;
 
     try {
+        const msgConflict = (currentLang === 'ar') 
+            ? "هذا الموعد محجوز بالفعل! يرجى اختيار تاريخ أو وقت آخر." 
+            : "Ce créneau horaire est déjà réservé ! Veuillez choisir une autre date ou heure.";
+
         // 1. Check local storage for double booking
         const localBookings = JSON.parse(localStorage.getItem('admin_bookings') || '[]');
-        const isConflictLocal = localBookings.some(b => b.datetime === datetime);
+        const isConflictLocal = localBookings.some(b => normalizeDateTime(b.datetime) === datetime);
 
         if (isConflictLocal) {
-            const msgConflict = (currentLang === 'ar') 
-                ? "هذا الموعد محجوز بالفعل! يرجى اختيار تاريخ أو وقت آخر." 
-                : "Ce créneau horaire est déjà réservé ! Veuillez choisir une autre date ou heure.";
             alert(msgConflict);
             if (submitBtn) submitBtn.disabled = false;
             return;
@@ -283,11 +296,17 @@ async function handleFormSubmit(e) {
         // 2. Check Firestore database for double booking
         if (db) {
             try {
-                const snapshot = await db.collection('bookings').where('datetime', '==', datetime).get();
-                if (!snapshot.empty) {
-                    const msgConflict = (currentLang === 'ar') 
-                        ? "هذا الموعد محجوز بالفعل! يرجى اختيار تاريخ أو وقت آخر." 
-                        : "Ce créneau horaire est déjà réservé ! Veuillez choisir une autre date ou heure.";
+                const snapshot = await db.collection('bookings').get();
+                let isConflictFirebase = false;
+
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    if (normalizeDateTime(data.datetime) === datetime) {
+                        isConflictFirebase = true;
+                    }
+                });
+
+                if (isConflictFirebase) {
                     alert(msgConflict);
                     if (submitBtn) submitBtn.disabled = false;
                     return;
@@ -310,7 +329,7 @@ async function handleFormSubmit(e) {
         localStorage.setItem('admin_bookings', JSON.stringify(localBookings));
 
         if (db) {
-            db.collection('bookings').add(newBooking).catch(err => console.error(err));
+            await db.collection('bookings').add(newBooking);
         }
 
         const msgSuccess = (currentLang === 'ar') ? "تم الحجز بنجاح!" : "Réservation effectuée avec succès !";
