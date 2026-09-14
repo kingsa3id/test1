@@ -204,8 +204,9 @@ function renderFloatingBubbles() {
 function injectAdminModalHTML() {
     if (document.getElementById('adminModal')) return;
 
+    // تم إضافة style="display: none;" لضمان عدم ظهورها افتراضياً
     const modalHTML = `
-    <div id="adminModal" class="fixed inset-0 bg-black/70 z-50 hidden flex items-center justify-center p-4">
+    <div id="adminModal" style="display: none;" class="fixed inset-0 bg-black/70 z-50 items-center justify-center p-4">
         <div class="bg-zinc-900 text-white w-full max-w-lg rounded-2xl p-6 border border-zinc-700 shadow-2xl relative">
             <button id="closeAdminBtn" class="absolute top-4 left-4 text-zinc-400 hover:text-white text-xl">&times;</button>
             <h3 class="text-xl font-bold mb-4 text-accent">لوحة تحكم الإعدادات (Admin Panel)</h3>
@@ -244,12 +245,12 @@ function openAdminModal() {
     document.getElementById('adminInstagram').value = settings.instagram || '';
     document.getElementById('adminTelegram').value = settings.telegram || '';
 
-    modal.classList.remove('hidden');
+    modal.style.display = 'flex';
 }
 
 function closeAdminModal() {
     const modal = document.getElementById('adminModal');
-    if (modal) modal.classList.add('hidden');
+    if (modal) modal.style.display = 'none';
 }
 
 function setupAdminModalEvents() {
@@ -550,3 +551,4 @@ async function handleFormSubmit(e) {
         if (submitBtn) submitBtn.disabled = false;
     }
 }
+
