@@ -549,7 +549,7 @@ footer {
    MOBILE RESPONSIVE STYLES (For screen width <= 768px)
    ============================================================ */
 @media screen and (max-width: 768px) {
-    /* إخفاء روابط القائمة الكبيرة على الجوال ليعود الشكل مرتباً مثل التصميم الأول */
+    /* إخفاء روابط القائمة الكبيرة على الجوال */
     .nav-links { 
         display: none !important; 
     }
@@ -559,21 +559,35 @@ footer {
         justify-content: space-between !important;
         align-items: center !important;
         flex-wrap: nowrap !important;
-        padding: 10px 4% !important;
+        padding: 12px 4% !important;
     }
 
-    /* تصغير الشعار وضبطه في سطر واحد دون تقطيع الكلمات */
+    /* جعل الشعار في سطر واحد وإجبار كل أجزائه والمسافات على البقاء بجانب بعضها */
     .brand-logo {
-        font-size: 1rem !important;
-        letter-spacing: 2px !important;
+        font-size: 0.95rem !important;
+        letter-spacing: 1px !important;
+        white-space: nowrap !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 4px !important;
+    }
+
+    /* إلغاء أي نزول للسطر داخل الشعار (مثل بريدج أو بلوك أو br) */
+    .brand-logo * {
+        display: inline !important;
         white-space: nowrap !important;
     }
+    
+    .brand-logo br {
+        display: none !important;
+    }
 
-    /* تصغير زر تغيير اللغة قليلاً ليتناسب مع المساحة المتاحة */
+    /* تصغير زر اللغة ليتناسب مع السطر العلوي */
     .lang-switch {
         padding: 6px 12px !important;
-        font-size: 0.78rem !important;
-        gap: 6px !important;
+        font-size: 0.75rem !important;
+        gap: 5px !important;
+        white-space: nowrap !important;
     }
 
     .hero-section {
