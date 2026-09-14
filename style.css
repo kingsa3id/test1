@@ -545,13 +545,20 @@ footer {
 }
 
 /* ============================================================
-   MOBILE RESPONSIVE STYLES & UX UPDATES (For screen width <= 768px)
+   MOBILE RESPONSIVE STYLES (For screen width <= 768px)
    ============================================================ */
 @media screen and (max-width: 768px) {
-    .nav-links { display: none; } /* Hide PC nav links */
+    /* Hide desktop nav links to keep the header clean like Image 1 */
+    .nav-links { 
+        display: none !important; 
+    }
 
     .navbar {
-        padding: 14px 5%;
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        flex-wrap: nowrap !important;
+        padding: 12px 5% !important;
     }
 
     .brand-logo {
@@ -597,7 +604,7 @@ footer {
     }
 
     .gallery-grid {
-        grid-template-columns: 1fr; /* Single column stack on phone */
+        grid-template-columns: 1fr;
         gap: 20px;
     }
 
@@ -606,7 +613,7 @@ footer {
     }
 
     .card-overlay {
-        opacity: 1; /* Always show category/title overlay on touch screens */
+        opacity: 1;
         background: linear-gradient(to top, rgba(10,10,12,0.9) 0%, transparent 80%);
     }
 
@@ -615,7 +622,7 @@ footer {
     }
 
     .about-container {
-        grid-template-columns: 1fr; /* Stack image above text */
+        grid-template-columns: 1fr;
         gap: 36px;
     }
 
@@ -655,32 +662,19 @@ footer {
     }
 
     /* ==========================================
-       تنسيقات مخصصة إضافية لتحسين شكل الموقع على الموبايل
+       تنسيقات مخصصة لتحسين شكل الموقع على الموبايل
        ========================================== */
 
-    /* 1. ترتيب الهيدر (الشعار، الروابط، وزر اللغة) بشكل منظم ولا يتداخل */
-    header nav, .header-container {
-        flex-wrap: wrap !important;
-        justify-content: center !important;
-        gap: 0.75rem !important;
-        padding: 0.75rem 1rem !important;
-    }
-
-    /* تصغير روابط التنقل قليلاً لتتناسب مع الشاشات الضيقة */
-    header nav a {
-        font-size: 0.9rem !important;
-        padding: 0.25rem 0.5rem !important;
-    }
-
-    /* 2. منع تكبير الشاشة التلقائي في آبل عند التركيز على الحقول */
+    /* 1. منع تكبير الشاشة التلقائي في آبل عند التركيز على الحقول */
     input, select, textarea {
         font-size: 16px !important;
     }
 
-    /* 3. تنسيق النوافذ المنبثقة (Modals) لتظهر في المنتصف وبحجم مريح */
+    /* 2. تنسيق النوافذ المنبثقة (Modals) لتظهر في المنتصف وبحجم مريح */
     #bookingModal .modal-content, 
     #bookingModal > div,
-    #adminModal > div {
+    #adminModal > div,
+    .modal-backdrop .modal-card {
         width: 92% !important;
         max-height: 85vh !important;
         overflow-y: auto !important;
@@ -689,7 +683,7 @@ footer {
         border-radius: 1rem !important;
     }
 
-    /* 4. ضبط أبعاد وأماكن الفقاعات العائمة (واتساب، انستغرام، اتصال) */
+    /* 3. ضبط أبعاد وأماكن الفقاعات العائمة أو زر الاتصال العائم */
     #floatingBubbles {
         bottom: 1.25rem !important;
         left: 1.25rem !important;
@@ -702,12 +696,12 @@ footer {
         font-size: 1.2rem !important;
     }
 
-    /* 5. منع النصوص الطويلة من الخروج عن حدود الشاشة */
+    /* 4. منع النصوص الطويلة من الخروج عن حدود الشاشة */
     h1, h2, p {
         word-break: break-word;
     }
 
-    /* 6. زيادة مساحات اللمس للأزرار لتكون مريحة للإصبع */
+    /* 5. زيادة مساحات اللمس للأزرار لتكون مريحة للإصبع */
     button, input[type="submit"], .btn-touch {
         min-height: 44px;
     }
