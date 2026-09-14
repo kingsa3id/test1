@@ -54,6 +54,7 @@ body {
     letter-spacing: 3px;
     color: var(--text-primary);
     text-decoration: none;
+    white-space: nowrap;
 }
 
 .brand-logo span {
@@ -548,7 +549,7 @@ footer {
    MOBILE RESPONSIVE STYLES (For screen width <= 768px)
    ============================================================ */
 @media screen and (max-width: 768px) {
-    /* Hide desktop nav links to keep the header clean like Image 1 */
+    /* إخفاء روابط القائمة الكبيرة على الجوال ليعود الشكل مرتباً مثل التصميم الأول */
     .nav-links { 
         display: none !important; 
     }
@@ -558,17 +559,26 @@ footer {
         justify-content: space-between !important;
         align-items: center !important;
         flex-wrap: nowrap !important;
-        padding: 12px 5% !important;
+        padding: 10px 4% !important;
     }
 
+    /* تصغير الشعار وضبطه في سطر واحد دون تقطيع الكلمات */
     .brand-logo {
-        font-size: 1.15rem;
-        letter-spacing: 1.5px;
+        font-size: 1rem !important;
+        letter-spacing: 2px !important;
+        white-space: nowrap !important;
+    }
+
+    /* تصغير زر تغيير اللغة قليلاً ليتناسب مع المساحة المتاحة */
+    .lang-switch {
+        padding: 6px 12px !important;
+        font-size: 0.78rem !important;
+        gap: 6px !important;
     }
 
     .hero-section {
         min-height: 100vh;
-        padding: 110px 18px 60px 18px;
+        padding: 100px 18px 60px 18px;
     }
 
     .hero-tagline {
@@ -661,16 +671,10 @@ footer {
         left: 20px;
     }
 
-    /* ==========================================
-       تنسيقات مخصصة لتحسين شكل الموقع على الموبايل
-       ========================================== */
-
-    /* 1. منع تكبير الشاشة التلقائي في آبل عند التركيز على الحقول */
     input, select, textarea {
         font-size: 16px !important;
     }
 
-    /* 2. تنسيق النوافذ المنبثقة (Modals) لتظهر في المنتصف وبحجم مريح */
     #bookingModal .modal-content, 
     #bookingModal > div,
     #adminModal > div,
@@ -683,25 +687,10 @@ footer {
         border-radius: 1rem !important;
     }
 
-    /* 3. ضبط أبعاد وأماكن الفقاعات العائمة أو زر الاتصال العائم */
-    #floatingBubbles {
-        bottom: 1.25rem !important;
-        left: 1.25rem !important;
-        gap: 0.6rem !important;
-    }
-    
-    #floatingBubbles a {
-        width: 3rem !important;
-        height: 3rem !important;
-        font-size: 1.2rem !important;
-    }
-
-    /* 4. منع النصوص الطويلة من الخروج عن حدود الشاشة */
     h1, h2, p {
         word-break: break-word;
     }
 
-    /* 5. زيادة مساحات اللمس للأزرار لتكون مريحة للإصبع */
     button, input[type="submit"], .btn-touch {
         min-height: 44px;
     }
