@@ -545,7 +545,7 @@ footer {
 }
 
 /* ============================================================
-   MOBILE RESPONSIVE STYLES (For screen width <= 768px)
+   MOBILE RESPONSIVE STYLES & UX UPDATES (For screen width <= 768px)
    ============================================================ */
 @media screen and (max-width: 768px) {
     .nav-links { display: none; } /* Hide PC nav links */
@@ -653,49 +653,61 @@ footer {
         right: auto;
         left: 20px;
     }
-}
 
-/* ==========================================
-   تحسينات المظهر والجاذبية للهواتف الذكية (Mobile UX)
-   ========================================== */
+    /* ==========================================
+       تنسيقات مخصصة إضافية لتحسين شكل الموقع على الموبايل
+       ========================================== */
 
-@media (max-width: 768px) {
-    /* 1. منع نظام آبل (iOS) من التكبير التلقائي المزعج عند التركيز على الحقول */
+    /* 1. ترتيب الهيدر (الشعار، الروابط، وزر اللغة) بشكل منظم ولا يتداخل */
+    header nav, .header-container {
+        flex-wrap: wrap !important;
+        justify-content: center !important;
+        gap: 0.75rem !important;
+        padding: 0.75rem 1rem !important;
+    }
+
+    /* تصغير روابط التنقل قليلاً لتتناسب مع الشاشات الضيقة */
+    header nav a {
+        font-size: 0.9rem !important;
+        padding: 0.25rem 0.5rem !important;
+    }
+
+    /* 2. منع تكبير الشاشة التلقائي في آبل عند التركيز على الحقول */
     input, select, textarea {
         font-size: 16px !important;
     }
 
-    /* 2. تحسين تصميم النوافذ المنبثقة (Modals) لتلائم الشاشات الصغيرة مع التمرير السلس */
-    #bookingModal > div, 
+    /* 3. تنسيق النوافذ المنبثقة (Modals) لتظهر في المنتصف وبحجم مريح */
+    #bookingModal .modal-content, 
+    #bookingModal > div,
     #adminModal > div {
         width: 92% !important;
         max-height: 85vh !important;
         overflow-y: auto !important;
-        margin: 1rem auto !important;
+        margin: auto !important;
         padding: 1.25rem !important;
         border-radius: 1rem !important;
     }
 
-    /* 3. تصغير وتعديل مواقع الفقاعات العائمة لكي لا تحجب المحتوى المهم */
+    /* 4. ضبط أبعاد وأماكن الفقاعات العائمة (واتساب، انستغرام، اتصال) */
     #floatingBubbles {
-        bottom: 1rem !important;
-        left: 1rem !important;
-        gap: 0.5rem !important;
+        bottom: 1.25rem !important;
+        left: 1.25rem !important;
+        gap: 0.6rem !important;
     }
     
     #floatingBubbles a {
-        width: 2.75rem !important;
-        height: 2.75rem !important;
-        font-size: 1.1rem !important;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
+        width: 3rem !important;
+        height: 3rem !important;
+        font-size: 1.2rem !important;
     }
 
-    /* 4. ضبط العناوين الرئيسية لتتلاءم مع عرض الشاشة بدون خروج النصوص */
-    h1, h2 {
+    /* 5. منع النصوص الطويلة من الخروج عن حدود الشاشة */
+    h1, h2, p {
         word-break: break-word;
     }
 
-    /* 5. زيادة مساحات اللمس للأزرار لتكون مريحة للإصبع */
+    /* 6. زيادة مساحات اللمس للأزرار لتكون مريحة للإصبع */
     button, input[type="submit"], .btn-touch {
         min-height: 44px;
     }
